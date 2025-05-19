@@ -69,6 +69,7 @@
       renderBoard();
       renderHand();
       updateStatus();
+      checkAutoPass();
     });
 
     socket.on("board-updated", ({ board: boardState, tilesLeft, currentTurn: turn }) => {
@@ -81,6 +82,7 @@
       renderBoard();
       updateStatus();
       checkWinConditions();
+      checkAutoPass();
     });
 
     function renderHand() {
@@ -135,6 +137,19 @@
     function checkWinConditions() {
       if (myTiles.length === 0) {
         alert("You win!");
+      }
+    }
+
+    function checkAutoPass() {
+      if (currentTurn !== myId) return;
+      if (boardTiles.length === 0) return;
+
+      const [first, last] = [boardTiles[0][0], boardTiles[boardTiles.length - 1][1]];
+      const hasPlayable = myTiles.some(tile => tile.includes(first) || tile.includes(last));
+
+      if (!hasPlayable) {
+        alert("No playable tiles. Turn skipped.");
+        socket.emit("play-tile", { roomCode, tile: null });
       }
     }
   </script>
