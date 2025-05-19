@@ -19,245 +19,231 @@
       -webkit-user-select: none;
     }
 
-    h1 {
-      margin-bottom: 0;
-    }
+h1 {
+margin-bottom: 0;
+}
 
-    #roomSection {
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: 100%;
-      max-width: 420px;
-    }
+\#roomSection {
+margin-top: 10px;
+display: flex;
+gap: 10px;
+flex-wrap: wrap;
+justify-content: center;
+width: 100%;
+max-width: 420px;
+}
 
-    #roomSection input {
-      flex: 1 1 45%;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-    }
+\#roomSection input {
+flex: 1 1 45%;
+padding: 12px;
+font-size: 16px;
+border-radius: 8px;
+border: none;
+outline: none;
+}
 
-    #roomSection button {
-      flex: 1 1 100%;
-      background: #4caf50;
-      color: white;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      padding: 12px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
+\#roomSection button {
+flex: 1 1 100%;
+background: #4caf50;
+color: white;
+font-size: 18px;
+border: none;
+border-radius: 8px;
+padding: 12px;
+cursor: pointer;
+transition: background-color 0.2s ease;
+}
 
-    #roomSection button:hover {
-      background: #45a049;
-    }
+\#roomSection button\:hover {
+background: #45a049;
+}
 
-    #gameStatus {
-      margin-top: 15px;
-      font-weight: 600;
-      font-size: 18px;
-      min-height: 24px;
-      text-align: center;
-      max-width: 420px;
-    }
+\#gameStatus {
+margin-top: 15px;
+font-weight: 600;
+font-size: 18px;
+min-height: 24px;
+text-align: center;
+max-width: 420px;
+}
 
-    #board, #hand {
-      margin-top: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      max-width: 420px;
-      gap: 8px;
-      min-height: 90px;
-    }
+\#board, #hand {
+margin-top: 20px;
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+max-width: 420px;
+gap: 8px;
+min-height: 90px;
+}
 
-    .tile {
-      background: white;
-      color: black;
-      border-radius: 10px;
-      width: 52px;
-      height: 85px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      font-size: 22px;
-      font-weight: bold;
-      user-select: none;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: border-color 0.2s ease;
-      white-space: pre-line;
-    }
+.tile {
+background: white;
+color: black;
+border-radius: 10px;
+width: 52px;
+height: 85px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+font-size: 22px;
+font-weight: bold;
+user-select: none;
+cursor: pointer;
+border: 2px solid transparent;
+transition: border-color 0.2s ease;
+white-space: pre-line;
+}
 
-    .tile.highlight {
-      border-color: yellow;
-      cursor: pointer;
-    }
+.tile.highlight {
+border-color: yellow;
+cursor: pointer;
+}
 
-    .tile.disabled {
-      cursor: default;
-      opacity: 0.5;
-    }
+.tile.disabled {
+cursor: default;
+opacity: 0.5;
+}
 
-    #hand {
-      margin-bottom: 40px;
-    }
+\#hand {
+margin-bottom: 40px;
+}
 
-    /* Modal styling */
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.75);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
-      user-select: none;
-    }
+/\* Modal styling \*/
+.modal {
+position: fixed;
+top: 0; left: 0;
+width: 100vw;
+height: 100vh;
+background: rgba(0,0,0,0.75);
+display: none;
+justify-content: center;
+align-items: center;
+z-index: 10;
+user-select: none;
+}
 
-    .modal.active {
-      display: flex;
-    }
+.modal.active {
+display: flex;
+}
 
-    .modal-content {
-      background: #333;
-      padding: 30px 40px;
-      border-radius: 12px;
-      text-align: center;
-      color: white;
-      max-width: 320px;
-      box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.7);
-    }
+.modal-content {
+background: #333;
+padding: 30px 40px;
+border-radius: 12px;
+text-align: center;
+color: white;
+max-width: 320px;
+box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.7);
+}
 
-    .modal-content h2 {
-      margin: 0 0 20px;
-      font-size: 26px;
-    }
+.modal-content h2 {
+margin: 0 0 20px;
+font-size: 26px;
+}
 
-    .modal-content button {
-      background: #4caf50;
-      color: white;
-      border: none;
-      padding: 12px 28px;
-      font-size: 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
+.modal-content button {
+background: #4caf50;
+color: white;
+border: none;
+padding: 12px 28px;
+font-size: 18px;
+border-radius: 8px;
+cursor: pointer;
+transition: background-color 0.2s ease;
+}
 
-    .modal-content button:hover {
-      background: #45a049;
-    }
+.modal-content button\:hover {
+background: #45a049;
+}
 
-    /* Toggle switch container */
-    .toggle-switch {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      color: white;
-      user-select: none;
-      cursor: pointer;
-      flex: 1 1 100%;
-      max-width: 150px;
-      margin-top: 6px;
-    }
+/\* Toggle switch container \*/
+.toggle-switch {
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 14px;
+color: white;
+user-select: none;
+cursor: pointer;
+flex: 1 1 100%;
+max-width: 150px;
+margin-top: 6px;
+}
 
-    /* Hide default checkbox */
-    .toggle-switch input[type="checkbox"] {
-      opacity: 0;
-      width: 0;
-      height: 0;
-      position: absolute;
-    }
+/\* Hide default checkbox \*/
+.toggle-switch input\[type="checkbox"] {
+opacity: 0;
+width: 0;
+height: 0;
+position: absolute;
+}
 
-    /* The slider */
-    .slider {
-      position: relative;
-      width: 36px;
-      height: 18px;
-      background-color: #555;
-      border-radius: 18px;
-      transition: background-color 0.3s;
-      flex-shrink: 0;
-    }
+/\* The slider \*/
+.slider {
+position: relative;
+width: 36px;
+height: 18px;
+background-color: #555;
+border-radius: 18px;
+transition: background-color 0.3s;
+flex-shrink: 0;
+}
 
-    /* The circle inside slider */
-    .slider::before {
-      content: "";
-      position: absolute;
-      width: 14px;
-      height: 14px;
-      left: 2px;
-      top: 2px;
-      background-color: white;
-      border-radius: 50%;
-      transition: transform 0.3s;
-    }
+/\* The circle inside slider \*/
+.slider::before {
+content: "";
+position: absolute;
+width: 14px;
+height: 14px;
+left: 2px;
+top: 2px;
+background-color: white;
+border-radius: 50%;
+transition: transform 0.3s;
+}
 
-    /* Checked state */
-    .toggle-switch input:checked + .slider {
-      background-color: #4caf50;
-    }
+/\* Checked state \*/
+.toggle-switch input\:checked + .slider {
+background-color: #4caf50;
+}
 
-    .toggle-switch input:checked + .slider::before {
-      transform: translateX(18px);
-    }
+.toggle-switch input\:checked + .slider::before {
+transform: translateX(18px);
+}
 
-    /* Optional label text styling */
-    .label-text {
-      user-select: none;
-      white-space: nowrap;
-    }
+/\* Optional label text styling \*/
+.label-text {
+user-select: none;
+white-space: nowrap;
+}
 
-    /* Responsive tweaks */
-    @media (max-width: 480px) {
-      .toggle-switch {
-        font-size: 12px;
-        max-width: 140px;
-        gap: 6px;
-      }
+/\* Responsive tweaks \*/
+@media (max-width: 480px) {
+.toggle-switch {
+font-size: 12px;
+max-width: 140px;
+gap: 6px;
+}
 
-      .slider {
-        width: 30px;
-        height: 16px;
-      }
+.slider {
+width: 30px;
+height: 16px;
+}
 
-      .slider::before {
-        width: 12px;
-        height: 12px;
-        top: 2px;
-        left: 2px;
-      }
+.slider::before {
+width: 12px;
+height: 12px;
+top: 2px;
+left: 2px;
+}
 
-      .toggle-switch input:checked + .slider::before {
-        transform: translateX(14px);
-      }
-    }
+.toggle-switch input\:checked + .slider::before {
+transform: translateX(14px);
+}
+}
 
-    /* Voice Chat Button Styling */
-    #voiceChatControls {
-      margin-top: 10px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      max-width: 420px;
-      flex-wrap: wrap;
-    }
-
-    #muteAudioToggle {
-      flex: 1 1 150px;
-    }
   </style>
 </head>
 <body>
@@ -265,31 +251,25 @@
   <div id="roomSection">
     <input id="playerName" placeholder="Your Name" autocomplete="off" />
 
-    <!-- Remember Name Toggle -->
-    <label class="toggle-switch" title="Remember Name">
-      <input type="checkbox" id="rememberNameToggle" />
-      <span class="slider"></span>
-      <span class="label-text">Remember Name</span>
-    </label>
+<!-- Remember Name Toggle -->
 
-    <input id="roomCode" placeholder="Room Code" autocomplete="off" />
-    <button onclick="joinRoom()">Join Room</button>
+<label class="toggle-switch" title="Remember Name">
+  <input type="checkbox" id="rememberNameToggle" />
+  <span class="slider"></span>
+  <span class="label-text">Remember Name</span>
+</label>
+
+<input id="roomCode" placeholder="Room Code" autocomplete="off" />
+<button onclick="joinRoom()">Join Room</button>
+
   </div>
-
-  <div id="voiceChatControls" style="display:none;">
-    <label class="toggle-switch" title="Mute Microphone">
-      <input type="checkbox" id="muteAudioToggle" />
-      <span class="slider"></span>
-      <span class="label-text">Mute Microphone</span>
-    </label>
-  </div>
-
   <div id="gameStatus"></div>
   <div id="board"></div>
   <h3>Your Hand</h3>
   <div id="hand"></div>
 
   <!-- Game Over Modal -->
+
   <div id="gameOverModal" class="modal">
     <div class="modal-content">
       <h2 id="winnerText">Player X won!</h2>
@@ -298,6 +278,7 @@
   </div>
 
   <!-- Blocked Modal -->
+
   <div id="blockedModal" class="modal">
     <div class="modal-content">
       <h2 id="blockedText">You are blocked!</h2>
@@ -308,7 +289,6 @@
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
   <script>
-    // === Existing Domino Game code ===
     const socket = io("https://dominoesgame.glitch.me");
     let currentRoom = "";
     let myTiles = [];
@@ -364,104 +344,123 @@
     socket.on("player-joined", ({ players: p, names }) => {
       players = p;
       playerNames = names;
-      updateStatus();
+      gameStatusEl.textContent =
+        `${players.length} player(s): ${Object.values(playerNames).join(", ")}`;
     });
 
-    socket.on("start-game", (data) => {
-      board = data.board || [];
-      myTiles = data.players[socket.id] || [];
+    socket.on("tiles", (tiles) => {
+      myTiles = tiles;
+      renderHand();
+    });
+
+    socket.on("game-start", (data) => {
+      board = data.board;
       currentTurn = data.currentTurn;
+      players = data.players;
+      playerNames = data.names;
       renderBoard();
       renderHand();
       updateStatus();
-      showVoiceChatControls(true);
+      checkBlockedTurn();
     });
 
-    socket.on("update-game", (data) => {
-      board = data.board || [];
-      myTiles = data.players[socket.id] || [];
+    socket.on("board-updated", (data) => {
+      board = data.board;
       currentTurn = data.currentTurn;
+      myTiles = data.tilesLeft[myId];
+      players = data.players || players;
+      playerNames = data.names || playerNames;
       renderBoard();
       renderHand();
       updateStatus();
+      checkBlockedTurn();
     });
 
-    socket.on("game-over", (winnerId) => {
-      winnerText.textContent = playerNames[winnerId] + " won!";
+    socket.on("player-passed", (id) => {
+      if (id === myId) {
+        showBlockedPopup("You are blocked and passed your turn.");
+      } else {
+        const name = playerNames[id] || "A player";
+        showBlockedPopup(`${name} is blocked and passed their turn.`);
+      }
+    });
+
+    socket.on("game-over", ({ winner }) => {
+      const winnerName = playerNames[winner] || "Unknown";
+      winnerText.textContent = `${winnerName} won the game!`;
       gameOverModal.classList.add("active");
     });
 
-    socket.on("blocked", (msg) => {
-      blockedText.textContent = msg || "You are blocked!";
+    function showBlockedPopup(message) {
+      blockedText.textContent = message;
       blockedModal.classList.add("active");
-    });
+    }
 
-    function renderBoard() {
-      boardEl.innerHTML = "";
-      if (board.length === 0) {
-        boardEl.textContent = "Board is empty";
-        return;
+    function updateStatus() {
+      if (currentTurn === myId) {
+        gameStatusEl.textContent = "Your Turn";
+      } else {
+        const name = playerNames[currentTurn] || "Opponent";
+        gameStatusEl.textContent = `${name}'s Turn`;
       }
-      board.forEach(tile => {
-        const tileEl = createTileElement(tile);
-        boardEl.appendChild(tileEl);
-      });
     }
 
     function renderHand() {
       handEl.innerHTML = "";
       myTiles.forEach(tile => {
-        const tileEl = createTileElement(tile);
-        tileEl.classList.add("highlight");
-        tileEl.onclick = () => playTile(tile);
-        handEl.appendChild(tileEl);
+        const tileDiv = document.createElement("div");
+        tileDiv.className = "tile";
+        if (isPlayable(tile) && currentTurn === myId) {
+          tileDiv.classList.add("highlight");
+          tileDiv.onclick = () => playTile(tile);
+        } else {
+          tileDiv.classList.add("disabled");
+        }
+        tileDiv.innerText = `${tile[0]}\n${tile[1]}`;
+        handEl.appendChild(tileDiv);
       });
     }
 
-    function createTileElement(tile) {
-      const tileEl = document.createElement("div");
-      tileEl.className = "tile";
-      tileEl.textContent = tile.left + "\n" + tile.right;
-      return tileEl;
+    function renderBoard() {
+      boardEl.innerHTML = "";
+      board.forEach(tile => {
+        const tileDiv = document.createElement("div");
+        tileDiv.className = "tile";
+        tileDiv.innerText = `${tile[0]}\n${tile[1]}`;
+        boardEl.appendChild(tileDiv);
+      });
+    }
+
+    function isPlayable(tile) {
+      if (board.length === 0) return true;
+      const left = board[0][0];
+      const right = board[board.length - 1][1];
+      return tile[0] === left || tile[1] === left || tile[0] === right || tile[1] === right;
+    }
+
+    function hasPlayableTile(tiles) {
+      return tiles && tiles.some(t => isPlayable(t));
+    }
+
+    function checkBlockedTurn() {
+      if (currentTurn !== myId) return;
+      if (!hasPlayableTile(myTiles)) {
+        // Auto-pass after 1 second with blocked message shown by server
+        setTimeout(() => {
+          socket.emit("play-tile", { roomCode: currentRoom, tile: null });
+        }, 1000);
+      }
     }
 
     function playTile(tile) {
-      if (socket.id !== currentTurn) {
-        alert("Not your turn!");
-        return;
-      }
-      socket.emit("play-tile", tile);
+      if (tile && !isPlayable(tile)) return;
+      socket.emit("play-tile", { roomCode: currentRoom, tile });
     }
 
-    function updateStatus() {
-      if (players.length === 0) {
-        gameStatusEl.textContent = "No players in room.";
-        return;
-      }
-      if (currentTurn) {
-        gameStatusEl.textContent = `Current turn: ${playerNames[currentTurn] || currentTurn}`;
-      } else {
-        gameStatusEl.textContent = "Waiting for game to start...";
-      }
-    }
+    // Remember Name toggle functionality
 
-    // Remember Name toggle logic
-    rememberToggle.addEventListener("change", () => {
-      if (rememberToggle.checked) {
-        localStorage.setItem("dominoPlayerName", playerNameInput.value);
-      } else {
-        localStorage.removeItem("dominoPlayerName");
-      }
-    });
-
-    playerNameInput.addEventListener("input", () => {
-      if (rememberToggle.checked) {
-        localStorage.setItem("dominoPlayerName", playerNameInput.value);
-      }
-    });
-
-    // Load remembered name on page load
-    window.addEventListener("load", () => {
+    // On page load, check localStorage and update input & toggle
+    window.addEventListener("DOMContentLoaded", () => {
       const savedName = localStorage.getItem("dominoPlayerName");
       if (savedName) {
         playerNameInput.value = savedName;
@@ -469,224 +468,22 @@
       }
     });
 
-    // === Voice Chat Code Starts Here ===
-
-    // Elements
-    const muteAudioToggle = document.getElementById("muteAudioToggle");
-    const voiceChatControls = document.getElementById("voiceChatControls");
-
-    // Show/hide voice chat controls
-    function showVoiceChatControls(show) {
-      voiceChatControls.style.display = show ? "flex" : "none";
-    }
-
-    // Peer connections and streams
-    const peers = {};
-    const localStreamPromise = navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
-    let localStream = null;
-    let isMuted = false;
-
-    // WebRTC configuration - use public STUN servers
-    const rtcConfig = {
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" }
-      ]
-    };
-
-    // Initialize local audio stream
-    async function initLocalStream() {
-      localStream = await localStreamPromise;
-      if (!localStream) {
-        console.warn("Microphone access denied or unavailable.");
-        muteAudioToggle.disabled = true;
-        return;
-      }
-      setLocalAudioMute(isMuted);
-    }
-
-    // Set local audio track mute/unmute
-    function setLocalAudioMute(mute) {
-      if (!localStream) return;
-      localStream.getAudioTracks().forEach(track => {
-        track.enabled = !mute;
-      });
-    }
-
-    // Handle mute toggle change
-    muteAudioToggle.addEventListener("change", () => {
-      isMuted = muteAudioToggle.checked;
-      setLocalAudioMute(isMuted);
-    });
-
-    // Socket signaling for voice chat
-    socket.on("connect", () => {
-      initLocalStream();
-    });
-
-    // When a new peer joins, signaling to start WebRTC
-    socket.on("voice-offer", async ({ fromId, sdp }) => {
-      if (fromId === socket.id) return; // ignore self
-
-      console.log("Received voice offer from", fromId);
-
-      const peerConnection = createPeerConnection(fromId);
-
-      try {
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
-
-        socket.emit("voice-answer", { toId: fromId, sdp: peerConnection.localDescription });
-      } catch (err) {
-        console.error("Error handling voice offer:", err);
+    // Save or remove name from localStorage when toggle changes or input changes
+    rememberToggle.addEventListener("change", () => {
+      if (rememberToggle.checked) {
+        localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
+      } else {
+        localStorage.removeItem("dominoPlayerName");
       }
     });
 
-    socket.on("voice-answer", async ({ fromId, sdp }) => {
-      if (fromId === socket.id) return;
-
-      console.log("Received voice answer from", fromId);
-
-      const peerConnection = peers[fromId];
-      if (!peerConnection) return;
-
-      try {
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
-      } catch (err) {
-        console.error("Error setting remote description for answer:", err);
+    // Update stored name as user types, only if toggle is ON
+    playerNameInput.addEventListener("input", () => {
+      if (rememberToggle.checked) {
+        localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
       }
     });
-
-    socket.on("voice-ice-candidate", ({ fromId, candidate }) => {
-      if (fromId === socket.id) return;
-
-      const peerConnection = peers[fromId];
-      if (!peerConnection) return;
-
-      if (candidate) {
-        peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {
-          console.error("Error adding received ICE candidate", e);
-        });
-      }
-    });
-
-    socket.on("voice-peer-left", (peerId) => {
-      console.log("Peer left voice chat:", peerId);
-      closePeerConnection(peerId);
-    });
-
-    // When joining room, initiate voice call offers to all existing peers
-    socket.on("existing-players", (existingPlayerIds) => {
-      existingPlayerIds.forEach(peerId => {
-        if (peerId !== socket.id) {
-          initiateCall(peerId);
-        }
-      });
-    });
-
-    // Create RTCPeerConnection and add local stream
-    function createPeerConnection(peerId) {
-      if (peers[peerId]) {
-        return peers[peerId];
-      }
-
-      const pc = new RTCPeerConnection(rtcConfig);
-      peers[peerId] = pc;
-
-      // Add local stream tracks
-      if (localStream) {
-        localStream.getTracks().forEach(track => {
-          pc.addTrack(track, localStream);
-        });
-      }
-
-      pc.onicecandidate = event => {
-        if (event.candidate) {
-          socket.emit("voice-ice-candidate", {
-            toId: peerId,
-            candidate: event.candidate,
-          });
-        }
-      };
-
-      pc.ontrack = event => {
-        // Play the remote audio stream
-        playRemoteStream(peerId, event.streams[0]);
-      };
-
-      pc.onconnectionstatechange = () => {
-        if (pc.connectionState === "disconnected" || pc.connectionState === "failed" || pc.connectionState === "closed") {
-          closePeerConnection(peerId);
-        }
-      };
-
-      return pc;
-    }
-
-    // Initiate call: create offer and send to peer
-    async function initiateCall(peerId) {
-      const pc = createPeerConnection(peerId);
-
-      try {
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-
-        socket.emit("voice-offer", {
-          toId: peerId,
-          sdp: pc.localDescription,
-        });
-      } catch (err) {
-        console.error("Error initiating call:", err);
-      }
-    }
-
-    // Play remote audio stream in hidden audio element
-    const remoteAudioElements = {};
-    function playRemoteStream(peerId, stream) {
-      let audio = remoteAudioElements[peerId];
-      if (!audio) {
-        audio = new Audio();
-        audio.autoplay = true;
-        audio.controls = false;
-        audio.style.display = "none";
-        document.body.appendChild(audio);
-        remoteAudioElements[peerId] = audio;
-      }
-      audio.srcObject = stream;
-      audio.play().catch(e => console.warn("Audio play error:", e));
-    }
-
-    // Close and cleanup peer connection and audio
-    function closePeerConnection(peerId) {
-      if (peers[peerId]) {
-        peers[peerId].close();
-        delete peers[peerId];
-      }
-      if (remoteAudioElements[peerId]) {
-        remoteAudioElements[peerId].pause();
-        remoteAudioElements[peerId].srcObject = null;
-        document.body.removeChild(remoteAudioElements[peerId]);
-        delete remoteAudioElements[peerId];
-      }
-    }
-
-    // When joining a room, ask server for existing players to initiate voice calls
-    socket.on("room-joined", (data) => {
-      if (!data) return;
-      const existing = data.existingPlayerIds || [];
-      socket.emit("request-existing-players");
-      showVoiceChatControls(true);
-    });
-
-    // When the page unloads, close all peer connections
-    window.addEventListener("beforeunload", () => {
-      Object.keys(peers).forEach(closePeerConnection);
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-      }
-    });
-
   </script>
+
 </body>
 </html>
