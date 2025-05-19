@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Domino Game</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #111; color: #fff; margin: 0; padding: 20px; }
+    body { font-family: Arial, sans-serif; background: #111; color: #fff; margin: 0; padding: 20px; user-select: none; }
     h1, h2 { text-align: center; }
     #hand, #board { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
     .tile {
       background: #eee; color: #000; border: 2px solid #000; border-radius: 8px;
-      padding: 10px; margin: 5px; font-size: 18px; cursor: grab; width: 60px; text-align: center;
+      padding: 10px; margin: 5px; font-size: 18px; cursor: pointer; width: 60px; text-align: center;
     }
+    .tile.playable { border-color: green; }
     #status { text-align: center; margin-top: 10px; font-weight: bold; }
     input, button { padding: 10px; font-size: 16px; margin: 5px; }
-    .selected { border: 2px solid red; }
   </style>
 </head>
 <body>
@@ -67,6 +67,7 @@
       currentTurn = turn;
       boardTiles = boardState;
       renderBoard();
+      renderHand();
       updateStatus();
     });
 
@@ -79,14 +80,20 @@
       }
       renderBoard();
       updateStatus();
+      checkWinConditions();
     });
 
     function renderHand() {
       hand.innerHTML = "";
+      const [first, last] = boardTiles.length > 0 ? [boardTiles[0][0], boardTiles[boardTiles.length - 1][1]] : [null, null];
       myTiles.forEach(tile => {
         const el = document.createElement("div");
         el.className = "tile";
         el.textContent = `${tile[0]}|${tile[1]}`;
+
+        const playable = boardTiles.length === 0 || tile.includes(first) || tile.includes(last);
+        if (currentTurn === myId && playable) el.classList.add("playable");
+
         el.onclick = () => playTile(tile);
         hand.appendChild(el);
       });
@@ -108,7 +115,6 @@
         return;
       }
 
-      // Validate move
       if (boardTiles.length === 0) {
         socket.emit("play-tile", { roomCode, tile });
         return;
@@ -124,6 +130,12 @@
 
     function updateStatus() {
       status.textContent = (currentTurn === myId) ? "Your turn" : "Waiting for opponent...";
+    }
+
+    function checkWinConditions() {
+      if (myTiles.length === 0) {
+        alert("You win!");
+      }
     }
   </script>
 </body>
