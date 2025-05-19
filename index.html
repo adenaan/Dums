@@ -1,132 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Domino Game</title>
   <style>
-    body { font-family: Arial, sans-serif; background-color: #222; color: white; margin: 0; padding: 0; }
-    #game { padding: 20px; text-align: center; }
-    #hand, #board { display: flex; flex-wrap: wrap; justify-content: center; margin: 10px 0; }
+    body { font-family: Arial, sans-serif; background: #111; color: #fff; margin: 0; padding: 20px; }
+    h1, h2 { text-align: center; }
+    #hand, #board { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
     .tile {
-      background: #fff;
-      color: #000;
-      border: 2px solid #000;
-      border-radius: 5px;
-      margin: 5px;
-      padding: 10px;
-      font-weight: bold;
-      width: 50px;
-      cursor: pointer;
+      background: #eee; color: #000; border: 2px solid #000; border-radius: 8px;
+      padding: 10px; margin: 5px; font-size: 18px; cursor: grab; width: 60px; text-align: center;
     }
-    .tile.selected {
-      border-color: red;
-    }
-    input, button {
-      padding: 10px;
-      font-size: 16px;
-      margin: 5px;
-    }
-    #status { margin-top: 10px; font-weight: bold; }
+    #status { text-align: center; margin-top: 10px; font-weight: bold; }
+    input, button { padding: 10px; font-size: 16px; margin: 5px; }
+    .selected { border: 2px solid red; }
   </style>
 </head>
 <body>
-  <div id="game">
-    <h1>Domino Game</h1>
-    <input type="text" id="roomCode" placeholder="Room Code">
+  <h1>Domino Game</h1>
+  <div style="text-align:center">
+    <input type="text" id="roomCode" placeholder="Enter Room Code">
     <button onclick="joinRoom()">Join Room</button>
-    <div id="status">Not connected</div>
-    <div id="board"></div>
-    <h2>Your Hand</h2>
-    <div id="hand"></div>
   </div>
+  <div id="status">Not connected</div>
+  <div id="board"></div>
+  <h2>Your Hand</h2>
+  <div id="hand"></div>
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
     const socket = io("https://dominoesgame.glitch.me");
-    const handEl = document.getElementById("hand");
-    const boardEl = document.getElementById("board");
-    const statusEl = document.getElementById("status");
+    const hand = document.getElementById("hand");
+    const board = document.getElementById("board");
+    const status = document.getElementById("status");
 
-    let selectedTile = null;
-    let currentTurn = null;
     let myId = null;
-    let currentRoom = null;
+    let myTiles = [];
+    let currentTurn = null;
+    let roomCode = null;
 
     socket.on("connect", () => {
       myId = socket.id;
-      statusEl.textContent = "Connected!";
+      status.textContent = "Connected to server.";
     });
 
     function joinRoom() {
-      const roomCode = document.getElementById("roomCode").value.trim();
+      roomCode = document.getElementById("roomCode").value.trim();
       if (roomCode) {
         socket.emit("join-room", roomCode);
-        currentRoom = roomCode;
-        statusEl.textContent = "Joining room...";
+        status.textContent = "Joining room...";
       }
     }
 
     socket.on("player-joined", (players) => {
-      statusEl.textContent = `Players in room: ${players.length}`;
+      status.textContent = `Players in room: ${players.length}`;
     });
 
     socket.on("tiles", (tiles) => {
-      renderHand(tiles);
+      myTiles = tiles;
+      renderHand();
     });
 
-    socket.on("game-start", ({ board, players, currentTurn: turn }) => {
+    socket.on("game-start", ({ board: boardState, players, currentTurn: turn }) => {
       currentTurn = turn;
-      renderBoard(board);
-      updateTurnDisplay();
+      renderBoard(boardState);
+      updateStatus();
     });
 
-    socket.on("board-updated", ({ board, tilesLeft, currentTurn: turn }) => {
+    socket.on("board-updated", ({ board: boardState, tilesLeft, currentTurn: turn }) => {
       currentTurn = turn;
-      renderBoard(board);
-      if (tilesLeft[socket.id]) renderHand(tilesLeft[socket.id]);
-      updateTurnDisplay();
+      if (tilesLeft[myId]) {
+        myTiles = tilesLeft[myId];
+        renderHand();
+      }
+      renderBoard(boardState);
+      updateStatus();
     });
 
-    function renderHand(tiles) {
-      handEl.innerHTML = "";
-      tiles.forEach((tile, index) => {
+    function renderHand() {
+      hand.innerHTML = "";
+      myTiles.forEach(tile => {
         const el = document.createElement("div");
         el.className = "tile";
         el.textContent = `${tile[0]}|${tile[1]}`;
-        el.addEventListener("click", () => {
-          selectedTile = tile;
-          document.querySelectorAll(".tile").forEach(t => t.classList.remove("selected"));
-          el.classList.add("selected");
-        });
-        handEl.appendChild(el);
+        el.onclick = () => playTile(tile);
+        hand.appendChild(el);
       });
     }
 
     function renderBoard(tiles) {
-      boardEl.innerHTML = "";
+      board.innerHTML = "";
       tiles.forEach(tile => {
         const el = document.createElement("div");
         el.className = "tile";
         el.textContent = `${tile[0]}|${tile[1]}`;
-        boardEl.appendChild(el);
+        board.appendChild(el);
       });
     }
 
-    function updateTurnDisplay() {
-      if (currentTurn === socket.id) {
-        statusEl.textContent = "Your turn - tap a tile, then tap the board to place it.";
-      } else {
-        statusEl.textContent = "Waiting for opponent...";
+    function playTile(tile) {
+      if (currentTurn !== myId) {
+        alert("Not your turn!");
+        return;
       }
+      socket.emit("play-tile", { roomCode, tile });
     }
 
-    boardEl.addEventListener("click", () => {
-      if (selectedTile && currentTurn === socket.id && currentRoom) {
-        socket.emit("play-tile", { roomCode: currentRoom, tile: selectedTile });
-        selectedTile = null;
-      }
-    });
+    function updateStatus() {
+      status.textContent = (currentTurn === myId) ? "Your turn" : "Waiting for opponent...";
+    }
   </script>
 </body>
 </html>
