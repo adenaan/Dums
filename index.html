@@ -19,230 +19,232 @@
       -webkit-user-select: none;
     }
 
+
 h1 {
-margin-bottom: 0;
+  margin-bottom: 0;
 }
 
-\#roomSection {
-margin-top: 10px;
-display: flex;
-gap: 10px;
-flex-wrap: wrap;
-justify-content: center;
-width: 100%;
-max-width: 420px;
+#roomSection {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 420px;
 }
 
-\#roomSection input {
-flex: 1 1 45%;
-padding: 12px;
-font-size: 16px;
-border-radius: 8px;
-border: none;
-outline: none;
+#roomSection input {
+  flex: 1 1 45%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
 }
 
-\#roomSection button {
-flex: 1 1 100%;
-background: #4caf50;
-color: white;
-font-size: 18px;
-border: none;
-border-radius: 8px;
-padding: 12px;
-cursor: pointer;
-transition: background-color 0.2s ease;
+#roomSection button {
+  flex: 1 1 100%;
+  background: #4caf50;
+  color: white;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-\#roomSection button\:hover {
-background: #45a049;
+#roomSection button:hover {
+  background: #45a049;
 }
 
-\#gameStatus {
-margin-top: 15px;
-font-weight: 600;
-font-size: 18px;
-min-height: 24px;
-text-align: center;
-max-width: 420px;
+#gameStatus {
+  margin-top: 15px;
+  font-weight: 600;
+  font-size: 18px;
+  min-height: 24px;
+  text-align: center;
+  max-width: 420px;
 }
 
-\#board, #hand {
-margin-top: 20px;
-display: flex;
-flex-wrap: wrap;
-justify-content: center;
-max-width: 420px;
-gap: 8px;
-min-height: 90px;
+#board, #hand {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 420px;
+  gap: 8px;
+  min-height: 90px;
 }
 
 .tile {
-background: white;
-color: black;
-border-radius: 10px;
-width: 52px;
-height: 85px;
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-font-size: 22px;
-font-weight: bold;
-user-select: none;
-cursor: pointer;
-border: 2px solid transparent;
-transition: border-color 0.2s ease;
-white-space: pre-line;
+  background: white;
+  color: black;
+  border-radius: 10px;
+  width: 52px;
+  height: 85px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  font-weight: bold;
+  user-select: none;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease;
+  white-space: pre-line;
 }
 
 .tile.highlight {
-border-color: yellow;
-cursor: pointer;
+  border-color: yellow;
+  cursor: pointer;
 }
 
 .tile.disabled {
-cursor: default;
-opacity: 0.5;
+  cursor: default;
+  opacity: 0.5;
 }
 
-\#hand {
-margin-bottom: 40px;
+#hand {
+  margin-bottom: 40px;
 }
 
-/\* Modal styling \*/
+/* Modal styling */
 .modal {
-position: fixed;
-top: 0; left: 0;
-width: 100vw;
-height: 100vh;
-background: rgba(0,0,0,0.75);
-display: none;
-justify-content: center;
-align-items: center;
-z-index: 10;
-user-select: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.75);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  user-select: none;
 }
 
 .modal.active {
-display: flex;
+  display: flex;
 }
 
 .modal-content {
-background: #333;
-padding: 30px 40px;
-border-radius: 12px;
-text-align: center;
-color: white;
-max-width: 320px;
-box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.7);
+  background: #333;
+  padding: 30px 40px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  max-width: 320px;
+  box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.7);
 }
 
 .modal-content h2 {
-margin: 0 0 20px;
-font-size: 26px;
+  margin: 0 0 20px;
+  font-size: 26px;
 }
 
 .modal-content button {
-background: #4caf50;
-color: white;
-border: none;
-padding: 12px 28px;
-font-size: 18px;
-border-radius: 8px;
-cursor: pointer;
-transition: background-color 0.2s ease;
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  font-size: 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.modal-content button\:hover {
-background: #45a049;
+.modal-content button:hover {
+  background: #45a049;
 }
 
-/\* Toggle switch container \*/
+/* Toggle switch container */
 .toggle-switch {
-display: flex;
-align-items: center;
-gap: 8px;
-font-size: 14px;
-color: white;
-user-select: none;
-cursor: pointer;
-flex: 1 1 100%;
-max-width: 150px;
-margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: white;
+  user-select: none;
+  cursor: pointer;
+  flex: 1 1 100%;
+  max-width: 150px;
+  margin-top: 6px;
 }
 
-/\* Hide default checkbox \*/
-.toggle-switch input\[type="checkbox"] {
-opacity: 0;
-width: 0;
-height: 0;
-position: absolute;
+/* Hide default checkbox */
+.toggle-switch input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
 }
 
-/\* The slider \*/
+/* The slider */
 .slider {
-position: relative;
-width: 36px;
-height: 18px;
-background-color: #555;
-border-radius: 18px;
-transition: background-color 0.3s;
-flex-shrink: 0;
+  position: relative;
+  width: 36px;
+  height: 18px;
+  background-color: #555;
+  border-radius: 18px;
+  transition: background-color 0.3s;
+  flex-shrink: 0;
 }
 
-/\* The circle inside slider \*/
+/* The circle inside slider */
 .slider::before {
-content: "";
-position: absolute;
-width: 14px;
-height: 14px;
-left: 2px;
-top: 2px;
-background-color: white;
-border-radius: 50%;
-transition: transform 0.3s;
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 2px;
+  top: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
 }
 
-/\* Checked state \*/
-.toggle-switch input\:checked + .slider {
-background-color: #4caf50;
+/* Checked state */
+.toggle-switch input:checked + .slider {
+  background-color: #4caf50;
 }
 
-.toggle-switch input\:checked + .slider::before {
-transform: translateX(18px);
+.toggle-switch input:checked + .slider::before {
+  transform: translateX(18px);
 }
 
-/\* Optional label text styling \*/
+/* Optional label text styling */
 .label-text {
-user-select: none;
-white-space: nowrap;
+  user-select: none;
+  white-space: nowrap;
 }
 
-/\* Responsive tweaks \*/
+/* Responsive tweaks */
 @media (max-width: 480px) {
-.toggle-switch {
-font-size: 12px;
-max-width: 140px;
-gap: 6px;
+  .toggle-switch {
+    font-size: 12px;
+    max-width: 140px;
+    gap: 6px;
+  }
+
+  .slider {
+    width: 30px;
+    height: 16px;
+  }
+
+  .slider::before {
+    width: 12px;
+    height: 12px;
+    top: 2px;
+    left: 2px;
+  }
+
+  .toggle-switch input:checked + .slider::before {
+    transform: translateX(14px);
+  }
 }
 
-.slider {
-width: 30px;
-height: 16px;
-}
-
-.slider::before {
-width: 12px;
-height: 12px;
-top: 2px;
-left: 2px;
-}
-
-.toggle-switch input\:checked + .slider::before {
-transform: translateX(14px);
-}
-}
 
   </style>
 </head>
@@ -251,8 +253,8 @@ transform: translateX(14px);
   <div id="roomSection">
     <input id="playerName" placeholder="Your Name" autocomplete="off" />
 
-<!-- Remember Name Toggle -->
 
+<!-- Remember Name Toggle -->
 <label class="toggle-switch" title="Remember Name">
   <input type="checkbox" id="rememberNameToggle" />
   <span class="slider"></span>
@@ -261,6 +263,7 @@ transform: translateX(14px);
 
 <input id="roomCode" placeholder="Room Code" autocomplete="off" />
 <button onclick="joinRoom()">Join Room</button>
+
 
   </div>
   <div id="gameStatus"></div>
