@@ -381,10 +381,10 @@ h1 {
 
     socket.on("player-passed", (id) => {
       if (id === myId) {
-        showBlockedPopup("You are blocked and passed your turn.");
+        showBlockedPopup("You KLOP and passed your turn.");
       } else {
         const name = playerNames[id] || "A player";
-        showBlockedPopup(`${name} is blocked and passed their turn.`);
+        showBlockedPopup(`${name} KLOPPED and passed their turn.`);
       }
     });
 
