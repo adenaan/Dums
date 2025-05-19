@@ -128,8 +128,10 @@
     function renderHand() {
       const handDiv = document.getElementById("hand");
       handDiv.innerHTML = "";
-      myTiles.forEach((tile, i) => {
+      let hasPlayable = false;
+      myTiles.forEach((tile) => {
         const playable = isPlayable(tile);
+        if (playable) hasPlayable = true;
         const div = document.createElement("div");
         div.className = "tile";
         if (playable) div.classList.add("highlight");
@@ -140,8 +142,8 @@
         handDiv.appendChild(div);
       });
 
-      // Skip if no playable tiles
-      if (currentTurn === myId && !myTiles.some(isPlayable)) {
+      if (currentTurn === myId && !hasPlayable) {
+        // No playable tile, send null to skip
         socket.emit("play-tile", { roomCode: currentRoom, tile: null });
       }
     }
@@ -165,7 +167,7 @@
     }
 
     function playTile(tile) {
-      if (!isPlayable(tile)) return;
+      if (tile && !isPlayable(tile)) return;
       socket.emit("play-tile", { roomCode: currentRoom, tile });
     }
   </script>
