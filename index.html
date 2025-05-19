@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en" >
 <head>
   <meta charset="UTF-8" />
@@ -18,222 +19,233 @@
       -webkit-user-select: none;
     }
 
-    h1 {
-      margin-bottom: 0;
-    }
+```
+h1 {
+  margin-bottom: 0;
+}
 
-    #roomSection {
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: 100%;
-      max-width: 420px;
-    }
+#roomSection {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 420px;
+}
 
-    #roomSection input {
-      flex: 1 1 45%;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-    }
+#roomSection input {
+  flex: 1 1 45%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
 
-    #roomSection button {
-      flex: 1 1 100%;
-      background: #4caf50;
-      color: white;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      padding: 12px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
+#roomSection button {
+  flex: 1 1 100%;
+  background: #4caf50;
+  color: white;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
 
-    #roomSection button:hover {
-      background: #45a049;
-    }
+#roomSection button:hover {
+  background: #45a049;
+}
 
-    #gameStatus {
-      margin-top: 15px;
-      font-weight: 600;
-      font-size: 18px;
-      min-height: 24px;
-      text-align: center;
-      max-width: 420px;
-    }
+#gameStatus {
+  margin-top: 15px;
+  font-weight: 600;
+  font-size: 18px;
+  min-height: 24px;
+  text-align: center;
+  max-width: 420px;
+}
 
-    #board, #hand {
-      margin-top: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      max-width: 420px;
-      gap: 8px;
-      min-height: 90px;
-    }
+#board, #hand {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 420px;
+  gap: 8px;
+  min-height: 90px;
+}
 
-    .tile {
-      background: white;
-      color: black;
-      border-radius: 10px;
-      width: 52px;
-      height: 85px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      font-size: 22px;
-      font-weight: bold;
-      user-select: none;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: border-color 0.2s ease;
-      white-space: pre-line;
-    }
+.tile {
+  background: white;
+  color: black;
+  border-radius: 10px;
+  width: 52px;
+  height: 85px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  font-weight: bold;
+  user-select: none;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease;
+  white-space: pre-line;
+}
 
-    .tile.highlight {
-      border-color: yellow;
-      cursor: pointer;
-    }
+.tile.highlight {
+  border-color: yellow;
+  cursor: pointer;
+}
 
-    .tile.disabled {
-      cursor: default;
-      opacity: 0.5;
-    }
+.tile.disabled {
+  cursor: default;
+  opacity: 0.5;
+}
 
-    #hand {
-      margin-bottom: 40px;
-    }
+#hand {
+  margin-bottom: 40px;
+}
 
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.75);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
-      user-select: none;
-    }
+/* Modal styling */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.75);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  user-select: none;
+}
 
-    .modal.active {
-      display: flex;
-    }
+.modal.active {
+  display: flex;
+}
 
-    .modal-content {
-      background: #333;
-      padding: 30px 40px;
-      border-radius: 12px;
-      text-align: center;
-      color: white;
-      max-width: 320px;
-      box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.7);
-    }
+.modal-content {
+  background: #333;
+  padding: 30px 40px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  max-width: 320px;
+  box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.7);
+}
 
-    .modal-content h2 {
-      margin: 0 0 20px;
-      font-size: 26px;
-    }
+.modal-content h2 {
+  margin: 0 0 20px;
+  font-size: 26px;
+}
 
-    .modal-content button {
-      background: #4caf50;
-      color: white;
-      border: none;
-      padding: 12px 28px;
-      font-size: 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
+.modal-content button {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  font-size: 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
 
-    .modal-content button:hover {
-      background: #45a049;
-    }
+.modal-content button:hover {
+  background: #45a049;
+}
 
-    .toggle-switch {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      color: white;
-      user-select: none;
-      cursor: pointer;
-      flex: 1 1 100%;
-      max-width: 150px;
-      margin-top: 6px;
-    }
+/* Toggle switch container */
+.toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: white;
+  user-select: none;
+  cursor: pointer;
+  flex: 1 1 100%;
+  max-width: 150px;
+  margin-top: 6px;
+}
 
-    .toggle-switch input[type="checkbox"] {
-      opacity: 0;
-      width: 0;
-      height: 0;
-      position: absolute;
-    }
+/* Hide default checkbox */
+.toggle-switch input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
 
-    .slider {
-      position: relative;
-      width: 36px;
-      height: 18px;
-      background-color: #555;
-      border-radius: 18px;
-      transition: background-color 0.3s;
-      flex-shrink: 0;
-    }
+/* The slider */
+.slider {
+  position: relative;
+  width: 36px;
+  height: 18px;
+  background-color: #555;
+  border-radius: 18px;
+  transition: background-color 0.3s;
+  flex-shrink: 0;
+}
 
-    .slider::before {
-      content: "";
-      position: absolute;
-      width: 14px;
-      height: 14px;
-      left: 2px;
-      top: 2px;
-      background-color: white;
-      border-radius: 50%;
-      transition: transform 0.3s;
-    }
+/* The circle inside slider */
+.slider::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 2px;
+  top: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
 
-    .toggle-switch input:checked + .slider {
-      background-color: #4caf50;
-    }
+/* Checked state */
+.toggle-switch input:checked + .slider {
+  background-color: #4caf50;
+}
 
-    .toggle-switch input:checked + .slider::before {
-      transform: translateX(18px);
-    }
+.toggle-switch input:checked + .slider::before {
+  transform: translateX(18px);
+}
 
-    .label-text {
-      user-select: none;
-      white-space: nowrap;
-    }
+/* Optional label text styling */
+.label-text {
+  user-select: none;
+  white-space: nowrap;
+}
 
-    @media (max-width: 480px) {
-      .toggle-switch {
-        font-size: 12px;
-        max-width: 140px;
-        gap: 6px;
-      }
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  .toggle-switch {
+    font-size: 12px;
+    max-width: 140px;
+    gap: 6px;
+  }
 
-      .slider {
-        width: 30px;
-        height: 16px;
-      }
+  .slider {
+    width: 30px;
+    height: 16px;
+  }
 
-      .slider::before {
-        width: 12px;
-        height: 12px;
-        top: 2px;
-        left: 2px;
-      }
+  .slider::before {
+    width: 12px;
+    height: 12px;
+    top: 2px;
+    left: 2px;
+  }
 
-      .toggle-switch input:checked + .slider::before {
-        transform: translateX(14px);
-      }
-    }
+  .toggle-switch input:checked + .slider::before {
+    transform: translateX(14px);
+  }
+}
+```
+
   </style>
 </head>
 <body>
@@ -241,28 +253,25 @@
   <div id="roomSection">
     <input id="playerName" placeholder="Your Name" autocomplete="off" />
 
-    <!-- Remember Name Toggle -->
-    <label class="toggle-switch" title="Remember Name">
-      <input type="checkbox" id="rememberNameToggle" />
-      <span class="slider"></span>
-      <span class="label-text">Remember Name</span>
-    </label>
+```
+<!-- Remember Name Toggle -->
+<label class="toggle-switch" title="Remember Name">
+  <input type="checkbox" id="rememberNameToggle" />
+  <span class="slider"></span>
+  <span class="label-text">Remember Name</span>
+</label>
 
-    <!-- Mic Mute Toggle -->
-    <label class="toggle-switch" title="Mute Microphone">
-      <input type="checkbox" id="micToggle" />
-      <span class="slider"></span>
-      <span class="label-text">Mute Mic</span>
-    </label>
+<input id="roomCode" placeholder="Room Code" autocomplete="off" />
+<button onclick="joinRoom()">Join Room</button>
+```
 
-    <input id="roomCode" placeholder="Room Code" autocomplete="off" />
-    <button onclick="joinRoom()">Join Room</button>
   </div>
-
   <div id="gameStatus"></div>
   <div id="board"></div>
   <h3>Your Hand</h3>
   <div id="hand"></div>
+
+  <!-- Game Over Modal -->
 
   <div id="gameOverModal" class="modal">
     <div class="modal-content">
@@ -270,6 +279,8 @@
       <button id="restartBtn">Restart Game</button>
     </div>
   </div>
+
+  <!-- Blocked Modal -->
 
   <div id="blockedModal" class="modal">
     <div class="modal-content">
@@ -279,6 +290,7 @@
   </div>
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
   <script>
     const socket = io("https://dominoesgame.glitch.me");
     let currentRoom = "";
@@ -304,27 +316,13 @@
     const playerNameInput = document.getElementById("playerName");
     const rememberToggle = document.getElementById("rememberNameToggle");
 
-    const micToggle = document.getElementById("micToggle");
-    let micStream = null;
+    restartBtn.onclick = () => {
+      location.reload();
+    };
 
-    // Mic mute functionality
-    micToggle.addEventListener("change", async () => {
-      if (micToggle.checked) {
-        if (!micStream) {
-          micStream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
-        }
-        if (micStream) {
-          micStream.getAudioTracks().forEach(track => (track.enabled = false));
-        }
-      } else {
-        if (micStream) {
-          micStream.getAudioTracks().forEach(track => (track.enabled = true));
-        }
-      }
-    });
-
-    restartBtn.onclick = () => location.reload();
-    blockedCloseBtn.onclick = () => blockedModal.classList.remove("active");
+    blockedCloseBtn.onclick = () => {
+      blockedModal.classList.remove("active");
+    };
 
     function joinRoom() {
       const code = document.getElementById("roomCode").value.trim();
@@ -342,11 +340,15 @@
       myId = socket.id;
     });
 
-    socket.on("room-full", () => alert("Room is full! Please try another room."));
+    socket.on("room-full", () => {
+      alert("Room is full! Please try another room.");
+    });
+
     socket.on("player-joined", ({ players: p, names }) => {
       players = p;
       playerNames = names;
-      gameStatusEl.textContent = `${players.length} player(s): ${Object.values(playerNames).join(", ")}`;
+      gameStatusEl.textContent =
+        `${players.length} player(s): ${Object.values(playerNames).join(", ")}`;
     });
 
     socket.on("tiles", (tiles) => {
@@ -378,12 +380,17 @@
     });
 
     socket.on("player-passed", (id) => {
-      const name = playerNames[id] || "A player";
-      showBlockedPopup(id === myId ? "You are blocked and passed your turn." : `${name} is blocked and passed their turn.`);
+      if (id === myId) {
+        showBlockedPopup("You are blocked and passed your turn.");
+      } else {
+        const name = playerNames[id] || "A player";
+        showBlockedPopup(`${name} is blocked and passed their turn.`);
+      }
     });
 
     socket.on("game-over", ({ winner }) => {
-      winnerText.textContent = `${playerNames[winner] || "Unknown"} won the game!`;
+      const winnerName = playerNames[winner] || "Unknown";
+      winnerText.textContent = `${winnerName} won the game!`;
       gameOverModal.classList.add("active");
     });
 
@@ -393,7 +400,12 @@
     }
 
     function updateStatus() {
-      gameStatusEl.textContent = currentTurn === myId ? "Your Turn" : `${playerNames[currentTurn] || "Opponent"}'s Turn`;
+      if (currentTurn === myId) {
+        gameStatusEl.textContent = "Your Turn";
+      } else {
+        const name = playerNames[currentTurn] || "Opponent";
+        gameStatusEl.textContent = `${name}'s Turn`;
+      }
     }
 
     function renderHand() {
@@ -436,6 +448,7 @@
     function checkBlockedTurn() {
       if (currentTurn !== myId) return;
       if (!hasPlayableTile(myTiles)) {
+        // Auto-pass after 1 second with blocked message shown by server
         setTimeout(() => {
           socket.emit("play-tile", { roomCode: currentRoom, tile: null });
         }, 1000);
@@ -447,6 +460,9 @@
       socket.emit("play-tile", { roomCode: currentRoom, tile });
     }
 
+    // Remember Name toggle functionality
+
+    // On page load, check localStorage and update input & toggle
     window.addEventListener("DOMContentLoaded", () => {
       const savedName = localStorage.getItem("dominoPlayerName");
       if (savedName) {
@@ -455,6 +471,7 @@
       }
     });
 
+    // Save or remove name from localStorage when toggle changes or input changes
     rememberToggle.addEventListener("change", () => {
       if (rememberToggle.checked) {
         localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
@@ -463,11 +480,13 @@
       }
     });
 
+    // Update stored name as user types, only if toggle is ON
     playerNameInput.addEventListener("input", () => {
       if (rememberToggle.checked) {
         localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
       }
     });
   </script>
+
 </body>
 </html>
