@@ -40,6 +40,8 @@
     let currentTurn = null;
     let roomCode = null;
     let boardTiles = [];
+    let tilesLeftByPlayer = {};
+    let lastPassed = false;
 
     socket.on("connect", () => {
       myId = socket.id;
@@ -66,6 +68,7 @@
     socket.on("game-start", ({ board: boardState, players, currentTurn: turn }) => {
       currentTurn = turn;
       boardTiles = boardState;
+      lastPassed = false;
       renderBoard();
       renderHand();
       updateStatus();
@@ -75,6 +78,7 @@
     socket.on("board-updated", ({ board: boardState, tilesLeft, currentTurn: turn }) => {
       currentTurn = turn;
       boardTiles = boardState;
+      tilesLeftByPlayer = tilesLeft;
       if (tilesLeft[myId]) {
         myTiles = tilesLeft[myId];
         renderHand();
@@ -117,6 +121,11 @@
         return;
       }
 
+      if (tile === null) {
+        socket.emit("play-tile", { roomCode, tile: null });
+        return;
+      }
+
       if (boardTiles.length === 0) {
         socket.emit("play-tile", { roomCode, tile });
         return;
@@ -125,6 +134,7 @@
       const [first, last] = [boardTiles[0][0], boardTiles[boardTiles.length - 1][1]];
       if (tile[0] === first || tile[1] === first || tile[0] === last || tile[1] === last) {
         socket.emit("play-tile", { roomCode, tile });
+        lastPassed = false;
       } else {
         alert("Invalid move. Tile does not match either end of the board.");
       }
@@ -148,8 +158,31 @@
       const hasPlayable = myTiles.some(tile => tile.includes(first) || tile.includes(last));
 
       if (!hasPlayable) {
-        alert("No playable tiles. Turn skipped.");
-        socket.emit("play-tile", { roomCode, tile: null });
+        if (lastPassed) {
+          endBlockedGame();
+        } else {
+          alert("No playable tiles. Turn skipped.");
+          lastPassed = true;
+          socket.emit("play-tile", { roomCode, tile: null });
+        }
+      } else {
+        lastPassed = false;
+      }
+    }
+
+    function endBlockedGame() {
+      const totals = Object.entries(tilesLeftByPlayer).map(([id, tiles]) => {
+        const sum = tiles.reduce((acc, t) => acc + t[0] + t[1], 0);
+        return { id, sum };
+      });
+      totals.sort((a, b) => a.sum - b.sum);
+
+      if (totals.length < 2 || totals[0].sum === totals[1].sum) {
+        alert("Game blocked! It's a draw.");
+      } else if (totals[0].id === myId) {
+        alert("Game blocked! You win by lowest pips.");
+      } else {
+        alert("Game blocked! Opponent wins by lowest pips.");
       }
     }
   </script>
