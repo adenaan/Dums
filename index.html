@@ -1,99 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Domino Game</title>
   <style>
-    * {
-      user-select: none;
-      -webkit-user-select: none;
-    }
     body {
       margin: 0;
       font-family: sans-serif;
-      background-color: #222;
-      color: #fff;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    #game {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 10px;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f0f0f0;
     }
-    #roomSection, #hand, #board, #gameStatus {
-      margin-top: 20px;
+    #board, #hand {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
+      margin: 10px;
     }
     .tile {
-      background: #fff;
-      color: #000;
-      border: 2px solid #000;
-      border-radius: 8px;
-      margin: 5px;
-      padding: 10px;
+      width: 50px;
+      height: 100px;
+      background: white;
+      border: 1px solid black;
       display: flex;
       flex-direction: column;
+      justify-content: space-around;
       align-items: center;
-      justify-content: center;
-      width: 50px;
-      height: 80px;
-      font-size: 1.2em;
+      margin: 5px;
+      font-size: 20px;
+      touch-action: manipulation;
     }
     .highlight {
-      background-color: yellow;
+      border: 3px solid green;
     }
-    button {
-      padding: 10px;
-      border: none;
-      background: #4caf50;
-      color: white;
-      font-size: 16px;
-      border-radius: 5px;
+    .disabled {
+      opacity: 0.5;
     }
   </style>
 </head>
 <body>
-  <h1>Domino Game</h1>
-  <div id="roomSection">
+  <div id="game">
     <input id="roomCode" placeholder="Enter Room Code" />
     <button onclick="joinRoom()">Join Room</button>
+    <div id="status"></div>
+    <div id="board"></div>
+    <div id="hand"></div>
   </div>
-  <div id="gameStatus"></div>
-  <div id="board"></div>
-  <h3>Your Hand</h3>
-  <div id="hand"></div>
 
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   <script>
-    const socket = io("https://dominoesgame.glitch.me");
-    let currentRoom = "";
-    let myTiles = [];
-    let myId = "";
-    let currentTurn = "";
-    let board = [];
-    let allTiles = {}; // from server
-    let players = [];
-
-    function joinRoom() {
-      const code = document.getElementById("roomCode").value;
-      if (!code) return;
-      currentRoom = code;
-      socket.emit("join-room", code);
-      document.getElementById("gameStatus").innerText = "Waiting for players...";
-    }
-
-    socket.on("connect", () => {
-      myId = socket.id;
+    const socket = io("https://dominoesgame.glitch.me", {
+      transports: ["websocket"]
     });
 
-    socket.on("player-joined", (p) => {
-      players = p;
-      document.getElementById("gameStatus").innerText = `${p.length} player(s) joined.`;
+    let roomCode = "";
+    let hand = [];
+    let board = [];
+    let currentTurn = "";
+    let playerId = "";
+    let players = [];
+    let consecutivePasses = 0;
+
+    socket.on("connect", () => {
+      playerId = socket.id;
+    });
+
+    function joinRoom() {
+      roomCode = document.getElementById("roomCode").value;
+      socket.emit("join-room", roomCode);
+    }
+
+    socket.on("player-joined", (playerList) => {
+      players = playerList;
+      document.getElementById("status").textContent = `Players in room: ${players.length}`;
     });
 
     socket.on("tiles", (tiles) => {
-      myTiles = tiles;
+      hand = tiles;
       renderHand();
     });
 
@@ -101,80 +93,72 @@
       board = data.board;
       currentTurn = data.currentTurn;
       players = data.players;
+      consecutivePasses = 0;
       renderBoard();
       renderHand();
       updateStatus();
-      checkBlockedTurn();
     });
 
     socket.on("board-updated", (data) => {
       board = data.board;
       currentTurn = data.currentTurn;
-      myTiles = data.tilesLeft[myId];
-      allTiles = data.tilesLeft;
+      consecutivePasses = data.consecutivePasses;
       renderBoard();
       renderHand();
       updateStatus();
       checkBlockedTurn();
     });
 
-    function updateStatus() {
-      const status = currentTurn === myId ? "Your Turn" : "Waiting...";
-      document.getElementById("gameStatus").innerText = status;
+    function renderBoard() {
+      const boardDiv = document.getElementById("board");
+      boardDiv.innerHTML = "";
+      board.forEach(tile => {
+        const div = createTile(tile);
+        boardDiv.appendChild(div);
+      });
     }
 
     function renderHand() {
       const handDiv = document.getElementById("hand");
       handDiv.innerHTML = "";
-      myTiles.forEach((tile) => {
-        const playable = isPlayable(tile);
-        const div = document.createElement("div");
-        div.className = "tile";
-        if (playable) div.classList.add("highlight");
-        div.innerText = `${tile[0]}\n${tile[1]}`;
-        if (playable && currentTurn === myId) {
-          div.onclick = () => playTile(tile);
-        }
+      hand.forEach(tile => {
+        const div = createTile(tile);
+        div.onclick = () => playTile(tile);
+        if (!isPlayable(tile)) div.classList.add("disabled");
         handDiv.appendChild(div);
       });
     }
 
-    function renderBoard() {
-      const boardDiv = document.getElementById("board");
-      boardDiv.innerHTML = "";
-      board.forEach(tile => {
-        const div = document.createElement("div");
-        div.className = "tile";
-        div.innerText = `${tile[0]}\n${tile[1]}`;
-        boardDiv.appendChild(div);
-      });
+    function updateStatus() {
+      document.getElementById("status").textContent = currentTurn === playerId ? "Your turn" : "Waiting...";
     }
 
-    function isPlayable(tile) {
+    function createTile([a, b]) {
+      const div = document.createElement("div");
+      div.className = "tile";
+      div.innerHTML = `<div>${a}</div><div>${b}</div>`;
+      return div;
+    }
+
+    function isPlayable([a, b]) {
       if (board.length === 0) return true;
-      const left = board[0][0];
-      const right = board[board.length - 1][1];
-      return tile[0] === left || tile[1] === left || tile[0] === right || tile[1] === right;
-    }
-
-    function hasPlayableTile(tiles) {
-      if (!tiles || tiles.length === 0) return false;
-      return tiles.some(t => isPlayable(t));
-    }
-
-    function checkBlockedTurn() {
-      if (currentTurn !== myId) return;
-
-      if (!hasPlayableTile(myTiles)) {
-        setTimeout(() => {
-          socket.emit("play-tile", { roomCode: currentRoom, tile: null });
-        }, 1000);
-      }
+      const [start, end] = [board[0][0], board[board.length - 1][1]];
+      return [a, b].includes(start) || [a, b].includes(end);
     }
 
     function playTile(tile) {
-      if (tile && !isPlayable(tile)) return;
-      socket.emit("play-tile", { roomCode: currentRoom, tile });
+      if (currentTurn !== playerId || !isPlayable(tile)) return;
+      socket.emit("play-tile", { roomCode, tile });
+    }
+
+    function checkBlockedTurn() {
+      if (currentTurn !== playerId) return;
+      const playable = hand.some(isPlayable);
+      if (!playable) {
+        setTimeout(() => {
+          socket.emit("pass-turn", roomCode);
+        }, 500);
+      }
     }
   </script>
 </body>
