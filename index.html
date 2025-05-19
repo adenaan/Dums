@@ -30,7 +30,6 @@
       justify-content: center;
       width: 100%;
       max-width: 420px;
-      align-items: center;
     }
 
     #roomSection input {
@@ -56,61 +55,6 @@
 
     #roomSection button:hover {
       background: #45a049;
-    }
-
-    /* Toggle container */
-    .toggle-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 1 1 45%;
-      user-select: none;
-      cursor: pointer;
-    }
-
-    /* Hide the default checkbox */
-    .toggle-container input[type="checkbox"] {
-      appearance: none;
-      -webkit-appearance: none;
-      width: 42px;
-      height: 22px;
-      background: #555;
-      border-radius: 12px;
-      position: relative;
-      outline: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      flex-shrink: 0;
-    }
-
-    /* The knob */
-    .toggle-container input[type="checkbox"]::before {
-      content: "";
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 18px;
-      height: 18px;
-      background: white;
-      border-radius: 50%;
-      transition: transform 0.3s ease;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    }
-
-    /* Checked state */
-    .toggle-container input[type="checkbox"]:checked {
-      background: #4caf50;
-    }
-
-    .toggle-container input[type="checkbox"]:checked::before {
-      transform: translateX(20px);
-    }
-
-    /* Label text */
-    .toggle-container label {
-      font-size: 14px;
-      color: #ccc;
-      user-select: none;
     }
 
     #gameStatus {
@@ -212,6 +156,92 @@
     .modal-content button:hover {
       background: #45a049;
     }
+
+    /* Toggle switch container */
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: white;
+      user-select: none;
+      cursor: pointer;
+      flex: 1 1 100%;
+      max-width: 150px;
+      margin-top: 6px;
+    }
+
+    /* Hide default checkbox */
+    .toggle-switch input[type="checkbox"] {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    /* The slider */
+    .slider {
+      position: relative;
+      width: 36px;
+      height: 18px;
+      background-color: #555;
+      border-radius: 18px;
+      transition: background-color 0.3s;
+      flex-shrink: 0;
+    }
+
+    /* The circle inside slider */
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      left: 2px;
+      top: 2px;
+      background-color: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    /* Checked state */
+    .toggle-switch input:checked + .slider {
+      background-color: #4caf50;
+    }
+
+    .toggle-switch input:checked + .slider::before {
+      transform: translateX(18px);
+    }
+
+    /* Optional label text styling */
+    .label-text {
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 480px) {
+      .toggle-switch {
+        font-size: 12px;
+        max-width: 140px;
+        gap: 6px;
+      }
+
+      .slider {
+        width: 30px;
+        height: 16px;
+      }
+
+      .slider::before {
+        width: 12px;
+        height: 12px;
+        top: 2px;
+        left: 2px;
+      }
+
+      .toggle-switch input:checked + .slider::before {
+        transform: translateX(14px);
+      }
+    }
   </style>
 </head>
 <body>
@@ -219,11 +249,13 @@
   <div id="roomSection">
     <input id="playerName" placeholder="Your Name" autocomplete="off" />
     
-    <div class="toggle-container" title="Remember your name for next time">
+    <!-- Remember Name Toggle -->
+    <label class="toggle-switch" title="Remember Name">
       <input type="checkbox" id="rememberNameToggle" />
-      <label for="rememberNameToggle">Remember Name</label>
-    </div>
-
+      <span class="slider"></span>
+      <span class="label-text">Remember Name</span>
+    </label>
+    
     <input id="roomCode" placeholder="Room Code" autocomplete="off" />
     <button onclick="joinRoom()">Join Room</button>
   </div>
@@ -272,39 +304,7 @@
     const blockedCloseBtn = document.getElementById("blockedCloseBtn");
 
     const playerNameInput = document.getElementById("playerName");
-    const rememberNameToggle = document.getElementById("rememberNameToggle");
-
-    // Load remembered name if available
-    window.addEventListener("DOMContentLoaded", () => {
-      const savedName = localStorage.getItem("dominoPlayerName");
-      if (savedName) {
-        playerNameInput.value = savedName;
-        rememberNameToggle.checked = true;
-      }
-    });
-
-    // Save or remove name based on toggle
-    rememberNameToggle.addEventListener("change", () => {
-      if (rememberNameToggle.checked) {
-        if (playerNameInput.value.trim()) {
-          localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
-        }
-      } else {
-        localStorage.removeItem("dominoPlayerName");
-      }
-    });
-
-    // Update saved name if typing while toggle is on
-    playerNameInput.addEventListener("input", () => {
-      if (rememberNameToggle.checked) {
-        const val = playerNameInput.value.trim();
-        if (val) {
-          localStorage.setItem("dominoPlayerName", val);
-        } else {
-          localStorage.removeItem("dominoPlayerName");
-        }
-      }
-    });
+    const rememberToggle = document.getElementById("rememberNameToggle");
 
     restartBtn.onclick = () => {
       location.reload();
@@ -449,6 +449,33 @@
       if (tile && !isPlayable(tile)) return;
       socket.emit("play-tile", { roomCode: currentRoom, tile });
     }
+
+    // Remember Name toggle functionality
+
+    // On page load, check localStorage and update input & toggle
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedName = localStorage.getItem("dominoPlayerName");
+      if (savedName) {
+        playerNameInput.value = savedName;
+        rememberToggle.checked = true;
+      }
+    });
+
+    // Save or remove name from localStorage when toggle changes or input changes
+    rememberToggle.addEventListener("change", () => {
+      if (rememberToggle.checked) {
+        localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
+      } else {
+        localStorage.removeItem("dominoPlayerName");
+      }
+    });
+
+    // Update stored name as user types, only if toggle is ON
+    playerNameInput.addEventListener("input", () => {
+      if (rememberToggle.checked) {
+        localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
+      }
+    });
   </script>
 </body>
 </html>
