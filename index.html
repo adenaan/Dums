@@ -30,6 +30,7 @@
       justify-content: center;
       width: 100%;
       max-width: 420px;
+      align-items: center;
     }
 
     #roomSection input {
@@ -55,6 +56,61 @@
 
     #roomSection button:hover {
       background: #45a049;
+    }
+
+    /* Toggle container */
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1 1 45%;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    /* Hide the default checkbox */
+    .toggle-container input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 42px;
+      height: 22px;
+      background: #555;
+      border-radius: 12px;
+      position: relative;
+      outline: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    /* The knob */
+    .toggle-container input[type="checkbox"]::before {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    /* Checked state */
+    .toggle-container input[type="checkbox"]:checked {
+      background: #4caf50;
+    }
+
+    .toggle-container input[type="checkbox"]:checked::before {
+      transform: translateX(20px);
+    }
+
+    /* Label text */
+    .toggle-container label {
+      font-size: 14px;
+      color: #ccc;
+      user-select: none;
     }
 
     #gameStatus {
@@ -162,6 +218,12 @@
   <h1>Domino Game</h1>
   <div id="roomSection">
     <input id="playerName" placeholder="Your Name" autocomplete="off" />
+    
+    <div class="toggle-container" title="Remember your name for next time">
+      <input type="checkbox" id="rememberNameToggle" />
+      <label for="rememberNameToggle">Remember Name</label>
+    </div>
+
     <input id="roomCode" placeholder="Room Code" autocomplete="off" />
     <button onclick="joinRoom()">Join Room</button>
   </div>
@@ -209,6 +271,41 @@
     const blockedText = document.getElementById("blockedText");
     const blockedCloseBtn = document.getElementById("blockedCloseBtn");
 
+    const playerNameInput = document.getElementById("playerName");
+    const rememberNameToggle = document.getElementById("rememberNameToggle");
+
+    // Load remembered name if available
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedName = localStorage.getItem("dominoPlayerName");
+      if (savedName) {
+        playerNameInput.value = savedName;
+        rememberNameToggle.checked = true;
+      }
+    });
+
+    // Save or remove name based on toggle
+    rememberNameToggle.addEventListener("change", () => {
+      if (rememberNameToggle.checked) {
+        if (playerNameInput.value.trim()) {
+          localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
+        }
+      } else {
+        localStorage.removeItem("dominoPlayerName");
+      }
+    });
+
+    // Update saved name if typing while toggle is on
+    playerNameInput.addEventListener("input", () => {
+      if (rememberNameToggle.checked) {
+        const val = playerNameInput.value.trim();
+        if (val) {
+          localStorage.setItem("dominoPlayerName", val);
+        } else {
+          localStorage.removeItem("dominoPlayerName");
+        }
+      }
+    });
+
     restartBtn.onclick = () => {
       location.reload();
     };
@@ -219,7 +316,7 @@
 
     function joinRoom() {
       const code = document.getElementById("roomCode").value.trim();
-      const name = document.getElementById("playerName").value.trim() || "Player";
+      const name = playerNameInput.value.trim() || "Player";
       if (!code) {
         alert("Please enter a room code.");
         return;
