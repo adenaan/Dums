@@ -3,71 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Online Domino Game</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      user-select: none;
-      -webkit-user-select: none;
-      -ms-user-select: none;
-    }
-    #board, #hand {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 10px;
-      justify-content: center;
-    }
-    .tile {
-      width: 50px;
-      height: 100px;
-      background: #fff;
-      border: 2px solid #000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-around;
-      cursor: pointer;
-    }
-    #status {
-      text-align: center;
-      padding: 10px;
-      font-size: 1.2em;
-    }
-  </style>
+  <title>Domino Game</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="status">Enter Room Code:</div>
-  <div style="text-align:center;">
-    <input type="text" id="roomInput" placeholder="Room code">
-    <button onclick="joinRoom()">Join Room</button>
+  <div class="game-container">
+    <div class="top-bar">
+      <input type="text" id="roomCode" placeholder="Room Code">
+      <button id="joinRoom">Join Room</button>
+    </div>
+    <div id="status">Not connected</div>
+    <div id="board" class="board"></div>
+    <div id="hand" class="hand"></div>
   </div>
-  <div id="board"></div>
-  <div id="hand"></div>
 
   <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
   <script>
     const socket = io("https://dominoesgame.glitch.me");
     let myId;
-    let myTiles = [];
-    let currentTurn = null;
     let roomCode = null;
+    let myTiles = [];
+    let boardTiles = [];
+    let currentTurn = null;
+
+    const statusDiv = document.getElementById("status");
+    const boardDiv = document.getElementById("board");
+    const handDiv = document.getElementById("hand");
 
     socket.on("connect", () => {
       myId = socket.id;
+      statusDiv.textContent = "Connected: " + myId;
     });
 
-    function joinRoom() {
-      roomCode = document.getElementById("roomInput").value;
+    document.getElementById("joinRoom").onclick = () => {
+      roomCode = document.getElementById("roomCode").value;
       if (roomCode) {
         socket.emit("join-room", roomCode);
-        document.getElementById("status").innerText = "Waiting for players...";
+        statusDiv.textContent = "Joining room...";
       }
-    }
+    };
 
     socket.on("player-joined", (players) => {
-      document.getElementById("status").innerText = `Players in room: ${players.length}`;
+      statusDiv.textContent = `Players in room: ${players.length}`;
     });
 
     socket.on("tiles", (tiles) => {
@@ -76,65 +53,22 @@
     });
 
     socket.on("game-start", ({ board, players, currentTurn: ct }) => {
-      renderBoard(board);
+      boardTiles = board;
       currentTurn = ct;
-      updateTurnDisplay();
+      renderBoard();
+      renderHand();
+      updateTurn();
     });
 
     socket.on("board-updated", ({ board, tilesLeft, currentTurn: ct }) => {
-      renderBoard(board);
+      boardTiles = board;
       myTiles = tilesLeft[myId];
-      renderHand();
       currentTurn = ct;
-      updateTurnDisplay();
+      renderBoard();
+      renderHand();
+      updateTurn();
     });
 
-    function updateTurnDisplay() {
-      const status = document.getElementById("status");
-      if (currentTurn === myId) {
-        status.innerText = "Your turn";
-      } else {
-        status.innerText = "Opponent's turn";
-      }
-    }
-
-    function renderTile(tile) {
-      const div = document.createElement("div");
-      div.className = "tile";
-      div.innerText = `${tile[0]}|${tile[1]}`;
-      return div;
-    }
-
-    function renderBoard(board) {
-      const boardDiv = document.getElementById("board");
-      boardDiv.innerHTML = "";
-      board.forEach(tile => {
-        boardDiv.appendChild(renderTile(tile));
-      });
-    }
-
-    function renderHand() {
-      const handDiv = document.getElementById("hand");
-      handDiv.innerHTML = "";
-      myTiles.forEach(tile => {
-        const tileDiv = renderTile(tile);
-        tileDiv.onclick = () => playTile(tile);
-        handDiv.appendChild(tileDiv);
-      });
-    }
-
-    function playTile(tile) {
-      if (currentTurn !== myId) return;
-      socket.emit("play-tile", { roomCode, tile });
-    }
-
-    // If no playable tile, allow player to pass
-    function passTurn() {
-      if (currentTurn !== myId) return;
-      socket.emit("play-tile", { roomCode, tile: null });
-    }
-
-    // Handle game-over event
     socket.on("game-over", ({ reason, winner, tie, scores }) => {
       if (reason === "blocked") {
         if (tie) {
@@ -146,6 +80,42 @@
         }
       }
     });
+
+    function renderBoard() {
+      boardDiv.innerHTML = "";
+      boardTiles.forEach(tile => {
+        const tileDiv = createTile(tile);
+        boardDiv.appendChild(tileDiv);
+      });
+    }
+
+    function renderHand() {
+      handDiv.innerHTML = "";
+      myTiles.forEach(tile => {
+        const tileDiv = createTile(tile);
+        tileDiv.onclick = () => {
+          if (currentTurn === myId) {
+            socket.emit("play-tile", { roomCode, tile });
+          }
+        };
+        handDiv.appendChild(tileDiv);
+      });
+    }
+
+    function createTile(tile) {
+      const div = document.createElement("div");
+      div.className = "tile";
+      div.textContent = `${tile[0]} | ${tile[1]}`;
+      return div;
+    }
+
+    function updateTurn() {
+      if (currentTurn === myId) {
+        statusDiv.textContent = "Your turn";
+      } else {
+        statusDiv.textContent = "Opponent's turn";
+      }
+    }
   </script>
 </body>
 </html>
