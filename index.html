@@ -245,7 +245,28 @@ h1 {
   }
 }
 
+/* Voice chat mute button styling */
+#muteButton {
+  margin-top: 15px;
+  background: #4caf50;
+  border: none;
+  color: white;
+  font-size: 16px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+  max-width: 420px;
+}
 
+#muteButton.muted {
+  background: #f44336;
+}
+
+#muteButton:focus {
+  outline: none;
+}
   </style>
 </head>
 <body>
@@ -289,204 +310,10 @@ h1 {
     </div>
   </div>
 
+  <!-- Voice chat mute toggle button -->
+  <button id="muteButton" title="Mute / Unmute Microphone">Mute Voice Chat</button>
+
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
   <script>
-    const socket = io("https://dominoesgame.glitch.me");
-    let currentRoom = "";
-    let myTiles = [];
-    let myId = "";
-    let currentTurn = "";
-    let board = [];
-    let players = [];
-    let playerNames = {};
-
-    const gameStatusEl = document.getElementById("gameStatus");
-    const boardEl = document.getElementById("board");
-    const handEl = document.getElementById("hand");
-
-    const gameOverModal = document.getElementById("gameOverModal");
-    const winnerText = document.getElementById("winnerText");
-    const restartBtn = document.getElementById("restartBtn");
-
-    const blockedModal = document.getElementById("blockedModal");
-    const blockedText = document.getElementById("blockedText");
-    const blockedCloseBtn = document.getElementById("blockedCloseBtn");
-
-    const playerNameInput = document.getElementById("playerName");
-    const rememberToggle = document.getElementById("rememberNameToggle");
-
-    restartBtn.onclick = () => {
-      location.reload();
-    };
-
-    blockedCloseBtn.onclick = () => {
-      blockedModal.classList.remove("active");
-    };
-
-    function joinRoom() {
-      const code = document.getElementById("roomCode").value.trim();
-      const name = playerNameInput.value.trim() || "Player";
-      if (!code) {
-        alert("Please enter a room code.");
-        return;
-      }
-      currentRoom = code;
-      socket.emit("join-room", { roomCode: code, playerName: name });
-      gameStatusEl.textContent = "Waiting for players...";
-    }
-
-    socket.on("connect", () => {
-      myId = socket.id;
-    });
-
-    socket.on("room-full", () => {
-      alert("Room is full! Please try another room.");
-    });
-
-    socket.on("player-joined", ({ players: p, names }) => {
-      players = p;
-      playerNames = names;
-      gameStatusEl.textContent =
-        `${players.length} player(s): ${Object.values(playerNames).join(", ")}`;
-    });
-
-    socket.on("tiles", (tiles) => {
-      myTiles = tiles;
-      renderHand();
-    });
-
-    socket.on("game-start", (data) => {
-      board = data.board;
-      currentTurn = data.currentTurn;
-      players = data.players;
-      playerNames = data.names;
-      renderBoard();
-      renderHand();
-      updateStatus();
-      checkBlockedTurn();
-    });
-
-    socket.on("board-updated", (data) => {
-      board = data.board;
-      currentTurn = data.currentTurn;
-      myTiles = data.tilesLeft[myId];
-      players = data.players || players;
-      playerNames = data.names || playerNames;
-      renderBoard();
-      renderHand();
-      updateStatus();
-      checkBlockedTurn();
-    });
-
-    socket.on("player-passed", (id) => {
-      if (id === myId) {
-        showBlockedPopup("You are blocked and passed your turn.");
-      } else {
-        const name = playerNames[id] || "A player";
-        showBlockedPopup(`${name} is blocked and passed their turn.`);
-      }
-    });
-
-    socket.on("game-over", ({ winner }) => {
-      const winnerName = playerNames[winner] || "Unknown";
-      winnerText.textContent = `${winnerName} won the game!`;
-      gameOverModal.classList.add("active");
-    });
-
-    function showBlockedPopup(message) {
-      blockedText.textContent = message;
-      blockedModal.classList.add("active");
-    }
-
-    function updateStatus() {
-      if (currentTurn === myId) {
-        gameStatusEl.textContent = "Your Turn";
-      } else {
-        const name = playerNames[currentTurn] || "Opponent";
-        gameStatusEl.textContent = `${name}'s Turn`;
-      }
-    }
-
-    function renderHand() {
-      handEl.innerHTML = "";
-      myTiles.forEach(tile => {
-        const tileDiv = document.createElement("div");
-        tileDiv.className = "tile";
-        if (isPlayable(tile) && currentTurn === myId) {
-          tileDiv.classList.add("highlight");
-          tileDiv.onclick = () => playTile(tile);
-        } else {
-          tileDiv.classList.add("disabled");
-        }
-        tileDiv.innerText = `${tile[0]}\n${tile[1]}`;
-        handEl.appendChild(tileDiv);
-      });
-    }
-
-    function renderBoard() {
-      boardEl.innerHTML = "";
-      board.forEach(tile => {
-        const tileDiv = document.createElement("div");
-        tileDiv.className = "tile";
-        tileDiv.innerText = `${tile[0]}\n${tile[1]}`;
-        boardEl.appendChild(tileDiv);
-      });
-    }
-
-    function isPlayable(tile) {
-      if (board.length === 0) return true;
-      const left = board[0][0];
-      const right = board[board.length - 1][1];
-      return tile[0] === left || tile[1] === left || tile[0] === right || tile[1] === right;
-    }
-
-    function hasPlayableTile(tiles) {
-      return tiles && tiles.some(t => isPlayable(t));
-    }
-
-    function checkBlockedTurn() {
-      if (currentTurn !== myId) return;
-      if (!hasPlayableTile(myTiles)) {
-        // Auto-pass after 1 second with blocked message shown by server
-        setTimeout(() => {
-          socket.emit("play-tile", { roomCode: currentRoom, tile: null });
-        }, 1000);
-      }
-    }
-
-    function playTile(tile) {
-      if (tile && !isPlayable(tile)) return;
-      socket.emit("play-tile", { roomCode: currentRoom, tile });
-    }
-
-    // Remember Name toggle functionality
-
-    // On page load, check localStorage and update input & toggle
-    window.addEventListener("DOMContentLoaded", () => {
-      const savedName = localStorage.getItem("dominoPlayerName");
-      if (savedName) {
-        playerNameInput.value = savedName;
-        rememberToggle.checked = true;
-      }
-    });
-
-    // Save or remove name from localStorage when toggle changes or input changes
-    rememberToggle.addEventListener("change", () => {
-      if (rememberToggle.checked) {
-        localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
-      } else {
-        localStorage.removeItem("dominoPlayerName");
-      }
-    });
-
-    // Update stored name as user types, only if toggle is ON
-    playerNameInput.addEventListener("input", () => {
-      if (rememberToggle.checked) {
-        localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
-      }
-    });
-  </script>
-
-</body>
-</html>
+    const socket = io("https://dominoesgame.glitch
