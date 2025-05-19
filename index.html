@@ -109,7 +109,6 @@
       margin-bottom: 40px;
     }
 
-    /* Modal styling */
     .modal {
       position: fixed;
       top: 0; left: 0;
@@ -157,7 +156,6 @@
       background: #45a049;
     }
 
-    /* Toggle switch container */
     .toggle-switch {
       display: flex;
       align-items: center;
@@ -171,7 +169,6 @@
       margin-top: 6px;
     }
 
-    /* Hide default checkbox */
     .toggle-switch input[type="checkbox"] {
       opacity: 0;
       width: 0;
@@ -179,7 +176,6 @@
       position: absolute;
     }
 
-    /* The slider */
     .slider {
       position: relative;
       width: 36px;
@@ -190,7 +186,6 @@
       flex-shrink: 0;
     }
 
-    /* The circle inside slider */
     .slider::before {
       content: "";
       position: absolute;
@@ -203,7 +198,6 @@
       transition: transform 0.3s;
     }
 
-    /* Checked state */
     .toggle-switch input:checked + .slider {
       background-color: #4caf50;
     }
@@ -212,13 +206,11 @@
       transform: translateX(18px);
     }
 
-    /* Optional label text styling */
     .label-text {
       user-select: none;
       white-space: nowrap;
     }
 
-    /* Responsive tweaks */
     @media (max-width: 480px) {
       .toggle-switch {
         font-size: 12px;
@@ -248,30 +240,30 @@
   <h1>Domino Game</h1>
   <div id="roomSection">
     <input id="playerName" placeholder="Your Name" autocomplete="off" />
-    
+
     <!-- Remember Name Toggle -->
     <label class="toggle-switch" title="Remember Name">
       <input type="checkbox" id="rememberNameToggle" />
       <span class="slider"></span>
       <span class="label-text">Remember Name</span>
     </label>
-    
-    <input id="roomCode" placeholder="Room Code" autocomplete="off" />
-    <button onclick="joinRoom()">Join Room</button>
 
     <!-- Mic Mute Toggle -->
-    <label class="toggle-switch" title="Mic Mute/Unmute" style="margin-top: 10px;">
-      <input type="checkbox" id="micMuteToggle" />
+    <label class="toggle-switch" title="Mute Microphone">
+      <input type="checkbox" id="micToggle" />
       <span class="slider"></span>
       <span class="label-text">Mute Mic</span>
     </label>
+
+    <input id="roomCode" placeholder="Room Code" autocomplete="off" />
+    <button onclick="joinRoom()">Join Room</button>
   </div>
+
   <div id="gameStatus"></div>
   <div id="board"></div>
   <h3>Your Hand</h3>
   <div id="hand"></div>
 
-  <!-- Game Over Modal -->
   <div id="gameOverModal" class="modal">
     <div class="modal-content">
       <h2 id="winnerText">Player X won!</h2>
@@ -279,7 +271,6 @@
     </div>
   </div>
 
-  <!-- Blocked Modal -->
   <div id="blockedModal" class="modal">
     <div class="modal-content">
       <h2 id="blockedText">You are blocked!</h2>
@@ -313,16 +304,27 @@
     const playerNameInput = document.getElementById("playerName");
     const rememberToggle = document.getElementById("rememberNameToggle");
 
-    const micMuteToggle = document.getElementById("micMuteToggle");
-    let localStream = null;
+    const micToggle = document.getElementById("micToggle");
+    let micStream = null;
 
-    restartBtn.onclick = () => {
-      location.reload();
-    };
+    // Mic mute functionality
+    micToggle.addEventListener("change", async () => {
+      if (micToggle.checked) {
+        if (!micStream) {
+          micStream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
+        }
+        if (micStream) {
+          micStream.getAudioTracks().forEach(track => (track.enabled = false));
+        }
+      } else {
+        if (micStream) {
+          micStream.getAudioTracks().forEach(track => (track.enabled = true));
+        }
+      }
+    });
 
-    blockedCloseBtn.onclick = () => {
-      blockedModal.classList.remove("active");
-    };
+    restartBtn.onclick = () => location.reload();
+    blockedCloseBtn.onclick = () => blockedModal.classList.remove("active");
 
     function joinRoom() {
       const code = document.getElementById("roomCode").value.trim();
@@ -340,15 +342,11 @@
       myId = socket.id;
     });
 
-    socket.on("room-full", () => {
-      alert("Room is full! Please try another room.");
-    });
-
+    socket.on("room-full", () => alert("Room is full! Please try another room."));
     socket.on("player-joined", ({ players: p, names }) => {
       players = p;
       playerNames = names;
-      gameStatusEl.textContent =
-        `${players.length} player(s): ${Object.values(playerNames).join(", ")}`;
+      gameStatusEl.textContent = `${players.length} player(s): ${Object.values(playerNames).join(", ")}`;
     });
 
     socket.on("tiles", (tiles) => {
@@ -380,17 +378,12 @@
     });
 
     socket.on("player-passed", (id) => {
-      if (id === myId) {
-        showBlockedPopup("You are blocked and passed your turn.");
-      } else {
-        const name = playerNames[id] || "A player";
-        showBlockedPopup(`${name} is blocked and passed their turn.`);
-      }
+      const name = playerNames[id] || "A player";
+      showBlockedPopup(id === myId ? "You are blocked and passed your turn." : `${name} is blocked and passed their turn.`);
     });
 
     socket.on("game-over", ({ winner }) => {
-      const winnerName = playerNames[winner] || "Unknown";
-      winnerText.textContent = `${winnerName} won the game!`;
+      winnerText.textContent = `${playerNames[winner] || "Unknown"} won the game!`;
       gameOverModal.classList.add("active");
     });
 
@@ -399,117 +392,82 @@
       blockedModal.classList.add("active");
     }
 
-    function renderBoard() {
-      boardEl.innerHTML = "";
-      board.forEach(tile => {
-        const tileEl = createTileElement(tile);
-        tileEl.classList.add("disabled");
-        boardEl.appendChild(tileEl);
-      });
+    function updateStatus() {
+      gameStatusEl.textContent = currentTurn === myId ? "Your Turn" : `${playerNames[currentTurn] || "Opponent"}'s Turn`;
     }
 
     function renderHand() {
       handEl.innerHTML = "";
       myTiles.forEach(tile => {
-        const tileEl = createTileElement(tile);
-        if (currentTurn === myId && canPlayTile(tile)) {
-          tileEl.classList.add("highlight");
-          tileEl.onclick = () => playTile(tile);
+        const tileDiv = document.createElement("div");
+        tileDiv.className = "tile";
+        if (isPlayable(tile) && currentTurn === myId) {
+          tileDiv.classList.add("highlight");
+          tileDiv.onclick = () => playTile(tile);
         } else {
-          tileEl.classList.add("disabled");
+          tileDiv.classList.add("disabled");
         }
-        handEl.appendChild(tileEl);
+        tileDiv.innerText = `${tile[0]}\n${tile[1]}`;
+        handEl.appendChild(tileDiv);
       });
     }
 
-    function createTileElement(tile) {
-      const tileEl = document.createElement("div");
-      tileEl.classList.add("tile");
-      tileEl.textContent = `${tile[0]}\n${tile[1]}`;
-      return tileEl;
+    function renderBoard() {
+      boardEl.innerHTML = "";
+      board.forEach(tile => {
+        const tileDiv = document.createElement("div");
+        tileDiv.className = "tile";
+        tileDiv.innerText = `${tile[0]}\n${tile[1]}`;
+        boardEl.appendChild(tileDiv);
+      });
     }
 
-    function canPlayTile(tile) {
-      if (board.length === 0) return true; // can play any tile first
-      const leftNum = board[0][0];
-      const rightNum = board[board.length - 1][1];
-      return (
-        tile[0] === leftNum ||
-        tile[1] === leftNum ||
-        tile[0] === rightNum ||
-        tile[1] === rightNum
-      );
+    function isPlayable(tile) {
+      if (board.length === 0) return true;
+      const left = board[0][0];
+      const right = board[board.length - 1][1];
+      return tile[0] === left || tile[1] === left || tile[0] === right || tile[1] === right;
     }
 
-    function playTile(tile) {
-      socket.emit("play-tile", { roomCode: currentRoom, tile });
-    }
-
-    function updateStatus() {
-      if (currentTurn === myId) {
-        gameStatusEl.textContent = "Your turn";
-      } else {
-        const name = playerNames[currentTurn] || "Opponent";
-        gameStatusEl.textContent = `${name}'s turn`;
-      }
+    function hasPlayableTile(tiles) {
+      return tiles && tiles.some(t => isPlayable(t));
     }
 
     function checkBlockedTurn() {
-      // This will be handled server-side mostly, but you can show a message or disable UI if needed
+      if (currentTurn !== myId) return;
+      if (!hasPlayableTile(myTiles)) {
+        setTimeout(() => {
+          socket.emit("play-tile", { roomCode: currentRoom, tile: null });
+        }, 1000);
+      }
     }
 
-    // Remember Name functionality
+    function playTile(tile) {
+      if (tile && !isPlayable(tile)) return;
+      socket.emit("play-tile", { roomCode: currentRoom, tile });
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
-      if (localStorage.getItem("rememberName") === "true") {
+      const savedName = localStorage.getItem("dominoPlayerName");
+      if (savedName) {
+        playerNameInput.value = savedName;
         rememberToggle.checked = true;
-        playerNameInput.value = localStorage.getItem("playerName") || "";
       }
     });
 
     rememberToggle.addEventListener("change", () => {
       if (rememberToggle.checked) {
-        localStorage.setItem("rememberName", "true");
-        localStorage.setItem("playerName", playerNameInput.value);
+        localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
       } else {
-        localStorage.removeItem("rememberName");
-        localStorage.removeItem("playerName");
+        localStorage.removeItem("dominoPlayerName");
       }
     });
 
     playerNameInput.addEventListener("input", () => {
       if (rememberToggle.checked) {
-        localStorage.setItem("playerName", playerNameInput.value);
+        localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
       }
     });
-
-    // Mic mute/unmute functionality
-    async function initMic() {
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        setMicMuted(micMuteToggle.checked); // Apply initial mute state
-      } catch (err) {
-        console.warn("Microphone access denied or not available:", err);
-        micMuteToggle.disabled = true;
-        micMuteToggle.nextElementSibling.textContent = "Mic Unavailable";
-      }
-    }
-
-    function setMicMuted(muted) {
-      if (!localStream) return;
-      localStream.getAudioTracks().forEach(track => {
-        track.enabled = !muted;
-      });
-      socket.emit("mic-mute-toggle", { roomCode: currentRoom, muted });
-    }
-
-    micMuteToggle.addEventListener("change", () => {
-      setMicMuted(micMuteToggle.checked);
-    });
-
-    window.addEventListener("DOMContentLoaded", () => {
-      initMic();
-    });
-
   </script>
 </body>
 </html>
