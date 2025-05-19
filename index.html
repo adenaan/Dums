@@ -5,198 +5,211 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Domino Game</title>
   <style>
+    * {
+      user-select: none;
+      -webkit-user-select: none;
+    }
     body {
-      font-family: sans-serif;
       margin: 0;
-      padding: 10px;
+      font-family: sans-serif;
+      background-color: #222;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
-    }
-    #form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-      max-width: 300px;
-      margin-bottom: 20px;
-    }
-    input, button {
       padding: 10px;
-      font-size: 1rem;
     }
-    #game {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-    #board {
+    #roomSection, #hand, #board, #gameStatus {
+      margin-top: 20px;
       display: flex;
       flex-wrap: wrap;
-      gap: 5px;
-      margin: 10px 0;
+      justify-content: center;
+    }
+    #roomSection input {
+      margin: 5px;
+      padding: 10px;
+      font-size: 16px;
     }
     .tile {
+      background: #fff;
+      color: #000;
+      border: 2px solid #000;
+      border-radius: 8px;
+      margin: 5px;
       padding: 10px;
-      background: lightgray;
-      border: 1px solid #aaa;
-      cursor: pointer;
-    }
-    #player-hand {
       display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 80px;
+      font-size: 1.2em;
     }
-    #messages {
-      margin-top: 10px;
-      color: red;
+    .highlight {
+      background-color: yellow;
     }
-    .popup {
-      position: fixed;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      border: 2px solid black;
-      padding: 20px;
-      z-index: 999;
+    button {
+      padding: 10px;
+      border: none;
+      background: #4caf50;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      margin: 5px;
     }
-    .hidden {
-      display: none;
+    @media (max-width: 600px) {
+      #roomSection {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
 <body>
   <h1>Domino Game</h1>
-  <div id="form">
-    <input id="playerName" placeholder="Your name" />
-    <input id="roomCode" placeholder="Room name" />
-    <button id="join">Join Room</button>
+  <div id="roomSection">
+    <input id="playerName" placeholder="Your Name" />
+    <input id="roomCode" placeholder="Room Code" />
+    <button onclick="joinRoom()">Join Room</button>
   </div>
-
-  <div id="game">
-    <div><strong>Current Turn:</strong> <span id="currentTurn">Waiting...</span></div>
-    <div id="board"></div>
-    <div><strong>Your Hand:</strong></div>
-    <div id="player-hand"></div>
-    <button id="pass">Pass Turn</button>
-    <div id="messages"></div>
-  </div>
-
-  <div id="popup" class="popup hidden">
-    <p id="popupText"></p>
-    <button id="restartBtn" class="hidden">Restart Game</button>
-  </div>
+  <div id="gameStatus"></div>
+  <div id="board"></div>
+  <h3>Your Hand</h3>
+  <div id="hand"></div>
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
-    const socket = io();
-    const playerNameInput = document.getElementById("playerName");
-    const roomCodeInput = document.getElementById("roomCode");
-    const joinBtn = document.getElementById("join");
-    const gameDiv = document.getElementById("game");
-    const boardDiv = document.getElementById("board");
-    const handDiv = document.getElementById("player-hand");
-    const currentTurnSpan = document.getElementById("currentTurn");
-    const passBtn = document.getElementById("pass");
-    const messages = document.getElementById("messages");
-    const popup = document.getElementById("popup");
-    const popupText = document.getElementById("popupText");
-    const restartBtn = document.getElementById("restartBtn");
-
-    let myId = null;
-    let roomCode = "";
-    let names = {};
-    let currentTurn = "";
+    const socket = io("https://dominoesgame.glitch.me");
+    let currentRoom = "";
     let myTiles = [];
+    let myId = "";
+    let currentTurn = "";
+    let board = [];
+    let allTiles = {};
+    let players = [];
+    let playerNames = {};
 
-    joinBtn.onclick = () => {
-      const playerName = playerNameInput.value.trim();
-      roomCode = roomCodeInput.value.trim();
-      if (!playerName || !roomCode) {
-        alert("Enter name and room");
-        return;
-      }
-      socket.emit("join-room", { roomCode, playerName });
-    };
+    function joinRoom() {
+      const code = document.getElementById("roomCode").value;
+      const name = document.getElementById("playerName").value || "Player";
+      if (!code) return;
+      currentRoom = code;
+      socket.emit("join-room", { roomCode: code, playerName: name });
+      document.getElementById("gameStatus").innerText = "Waiting for players...";
+    }
 
-    socket.on("player-joined", ({ players, names: n }) => {
-      names = n;
+    socket.on("connect", () => {
       myId = socket.id;
     });
 
+    socket.on("player-joined", ({ players: p, names }) => {
+      players = p;
+      playerNames = names;
+      document.getElementById("gameStatus").innerText =
+        `${p.length} player(s) joined: ${Object.values(names).join(", ")}`;
+    });
+
     socket.on("tiles", (tiles) => {
-      gameDiv.style.display = "flex";
       myTiles = tiles;
       renderHand();
     });
 
-    socket.on("game-start", ({ board, currentTurn: turn, names: n }) => {
-      names = n;
-      currentTurn = turn;
-      updateBoard(board);
-      updateTurn();
+    socket.on("game-start", (data) => {
+      board = data.board;
+      currentTurn = data.currentTurn;
+      players = data.players;
+      playerNames = data.names;
+      renderBoard();
+      renderHand();
+      updateStatus();
+      checkBlockedTurn();
     });
 
-    socket.on("board-updated", ({ board, currentTurn: turn, names: n }) => {
-      names = n;
-      currentTurn = turn;
-      updateBoard(board);
-      updateTurn();
+    socket.on("board-updated", (data) => {
+      board = data.board;
+      currentTurn = data.currentTurn;
+      myTiles = data.tilesLeft[myId];
+      allTiles = data.tilesLeft;
+      playerNames = data.names;
+      renderBoard();
+      renderHand();
+      updateStatus();
+      checkBlockedTurn();
     });
 
     socket.on("player-passed", (id) => {
-      const msg = id === myId ? "You are blocked!" : `${names[id]} is blocked.`;
-      showPopup(msg);
+      if (id === myId) {
+        alert("You are blocked and passed your turn.");
+      } else {
+        alert(`${playerNames[id] || "A player"} is blocked and passed their turn.`);
+      }
     });
 
     socket.on("game-over", ({ winner }) => {
-      const winName = names[winner] || "Someone";
-      showPopup(`${winName} wins!`, true);
+      const winnerName = playerNames[winner] || "Unknown";
+      alert(`${winnerName} has won the game!`);
+      const restart = confirm("Game over! Do you want to restart?");
+      if (restart) {
+        location.reload();
+      }
     });
 
-    passBtn.onclick = () => {
-      socket.emit("play-tile", { roomCode, tile: null });
-    };
+    function updateStatus() {
+      const status = currentTurn === myId ? "Your Turn" : `${playerNames[currentTurn]}'s Turn`;
+      document.getElementById("gameStatus").innerText = status;
+    }
 
     function renderHand() {
+      const handDiv = document.getElementById("hand");
       handDiv.innerHTML = "";
-      myTiles.forEach((tile, i) => {
-        const el = document.createElement("div");
-        el.className = "tile";
-        el.textContent = `${tile[0]}|${tile[1]}`;
-        el.onclick = () => {
-          socket.emit("play-tile", { roomCode, tile });
-        };
-        handDiv.appendChild(el);
+      myTiles.forEach((tile) => {
+        const playable = isPlayable(tile);
+        const div = document.createElement("div");
+        div.className = "tile";
+        if (playable) div.classList.add("highlight");
+        div.innerText = `${tile[0]}\n${tile[1]}`;
+        if (playable && currentTurn === myId) {
+          div.onclick = () => playTile(tile);
+        }
+        handDiv.appendChild(div);
       });
     }
 
-    function updateBoard(board) {
+    function renderBoard() {
+      const boardDiv = document.getElementById("board");
       boardDiv.innerHTML = "";
       board.forEach(tile => {
-        const el = document.createElement("div");
-        el.className = "tile";
-        el.textContent = `${tile[0]}|${tile[1]}`;
-        boardDiv.appendChild(el);
+        const div = document.createElement("div");
+        div.className = "tile";
+        div.innerText = `${tile[0]}\n${tile[1]}`;
+        boardDiv.appendChild(div);
       });
     }
 
-    function updateTurn() {
-      currentTurnSpan.textContent = currentTurn === myId ? "Your turn" : `${names[currentTurn]}'s turn`;
+    function isPlayable(tile) {
+      if (board.length === 0) return true;
+      const left = board[0][0];
+      const right = board[board.length - 1][1];
+      return tile[0] === left || tile[1] === left || tile[0] === right || tile[1] === right;
     }
 
-    function showPopup(text, showRestart = false) {
-      popupText.textContent = text;
-      popup.classList.remove("hidden");
-      restartBtn.classList.toggle("hidden", !showRestart);
+    function hasPlayableTile(tiles) {
+      return tiles && tiles.some(t => isPlayable(t));
     }
 
-    restartBtn.onclick = () => {
-      popup.classList.add("hidden");
-      location.reload();
-    };
+    function checkBlockedTurn() {
+      if (currentTurn !== myId) return;
+      if (!hasPlayableTile(myTiles)) {
+        setTimeout(() => {
+          socket.emit("play-tile", { roomCode: currentRoom, tile: null });
+        }, 1000);
+      }
+    }
+
+    function playTile(tile) {
+      if (tile && !isPlayable(tile)) return;
+      socket.emit("play-tile", { roomCode: currentRoom, tile });
+    }
   </script>
 </body>
 </html>
