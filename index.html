@@ -39,6 +39,7 @@
     let myTiles = [];
     let currentTurn = null;
     let roomCode = null;
+    let boardTiles = [];
 
     socket.on("connect", () => {
       myId = socket.id;
@@ -64,17 +65,19 @@
 
     socket.on("game-start", ({ board: boardState, players, currentTurn: turn }) => {
       currentTurn = turn;
-      renderBoard(boardState);
+      boardTiles = boardState;
+      renderBoard();
       updateStatus();
     });
 
     socket.on("board-updated", ({ board: boardState, tilesLeft, currentTurn: turn }) => {
       currentTurn = turn;
+      boardTiles = boardState;
       if (tilesLeft[myId]) {
         myTiles = tilesLeft[myId];
         renderHand();
       }
-      renderBoard(boardState);
+      renderBoard();
       updateStatus();
     });
 
@@ -89,9 +92,9 @@
       });
     }
 
-    function renderBoard(tiles) {
+    function renderBoard() {
       board.innerHTML = "";
-      tiles.forEach(tile => {
+      boardTiles.forEach(tile => {
         const el = document.createElement("div");
         el.className = "tile";
         el.textContent = `${tile[0]}|${tile[1]}`;
@@ -104,7 +107,19 @@
         alert("Not your turn!");
         return;
       }
-      socket.emit("play-tile", { roomCode, tile });
+
+      // Validate move
+      if (boardTiles.length === 0) {
+        socket.emit("play-tile", { roomCode, tile });
+        return;
+      }
+
+      const [first, last] = [boardTiles[0][0], boardTiles[boardTiles.length - 1][1]];
+      if (tile[0] === first || tile[1] === first || tile[0] === last || tile[1] === last) {
+        socket.emit("play-tile", { roomCode, tile });
+      } else {
+        alert("Invalid move. Tile does not match either end of the board.");
+      }
     }
 
     function updateStatus() {
