@@ -89,16 +89,54 @@
     .player-turn {
       border-color: #4caf50;
     }
+
+    #roomSection {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-width: 320px;
+    width: 100%;
+  }
+
+  #roomSection input {
+    flex: 1 1 140px;
+    min-width: 120px;
+    padding: 10px;
+    font-size: 1em;
+    border-radius: 5px;
+    border: none;
+  }
+
+  #roomSection button {
+    flex: 1 1 100px;
+    min-width: 100px;
+    cursor: pointer;
+  }
+
+  @media (max-width: 480px) {
+    #roomSection {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    #roomSection input, #roomSection button {
+      flex: unset;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  }
   </style>
 </head>
 <body>
   <h1>Domino Game</h1>
 
   <div id="roomSection">
-    <input id="playerName" placeholder="Enter your name" />
-    <input id="roomCode" placeholder="Enter Room Code" />
-    <button onclick="joinRoom()">Join Room</button>
-  </div>
+  <input id="playerName" placeholder="Enter Your Name" />
+  <input id="roomCode" placeholder="Enter Room Code" />
+  <button onclick="joinRoom()">Join Room</button>
+</div>
+
 
   <div id="playersList"></div>
 
