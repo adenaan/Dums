@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Domino Game</title>
   <style>
     * {
@@ -59,7 +59,6 @@
     <input id="roomCode" placeholder="Enter Room Code" />
     <button onclick="joinRoom()">Join Room</button>
   </div>
-
   <div id="gameStatus"></div>
   <div id="board"></div>
   <h3>Your Hand</h3>
@@ -73,7 +72,7 @@
     let myId = "";
     let currentTurn = "";
     let board = [];
-    let allTiles = {}; // updated from server
+    let allTiles = {}; // from server
     let players = [];
 
     function joinRoom() {
@@ -105,6 +104,7 @@
       renderBoard();
       renderHand();
       updateStatus();
+      checkBlockedTurn();
     });
 
     socket.on("board-updated", (data) => {
@@ -115,20 +115,7 @@
       renderBoard();
       renderHand();
       updateStatus();
-
-      if (currentTurn === myId && !hasPlayableTile(myTiles)) {
-        socket.emit("play-tile", { roomCode: currentRoom, tile: null });
-      }
-
-      checkAllBlocked();
-    });
-
-    socket.on("game-over", (data) => {
-      if (data.reason === "win") {
-        alert("Game over! Winner: " + data.winner);
-      } else {
-        alert("Game over! No playable tiles.");
-      }
+      checkBlockedTurn();
     });
 
     function updateStatus() {
@@ -171,14 +158,17 @@
     }
 
     function hasPlayableTile(tiles) {
-      return tiles.some(tile => isPlayable(tile));
+      if (!tiles || tiles.length === 0) return false;
+      return tiles.some(t => isPlayable(t));
     }
 
-    function checkAllBlocked() {
-      if (!allTiles || !players.length) return;
-      const allBlocked = players.every(pid => !hasPlayableTile(allTiles[pid] || []));
-      if (allBlocked) {
-        socket.emit("game-over", { roomCode: currentRoom });
+    function checkBlockedTurn() {
+      if (currentTurn !== myId) return;
+
+      if (!hasPlayableTile(myTiles)) {
+        setTimeout(() => {
+          socket.emit("play-tile", { roomCode: currentRoom, tile: null });
+        }, 1000);
       }
     }
 
