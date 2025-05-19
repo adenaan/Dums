@@ -3,61 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Domino Game</title>
+  <title>Online Domino Game</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #111; color: #fff; margin: 0; padding: 20px; user-select: none; }
-    h1, h2 { text-align: center; }
-    #hand, #board { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
-    .tile {
-      background: #eee; color: #000; border: 2px solid #000; border-radius: 8px;
-      padding: 10px; margin: 5px; font-size: 18px; cursor: pointer; width: 60px; text-align: center;
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
     }
-    .tile.playable { border-color: green; }
-    #status { text-align: center; margin-top: 10px; font-weight: bold; }
-    input, button { padding: 10px; font-size: 16px; margin: 5px; }
+    #board, #hand {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px;
+      justify-content: center;
+    }
+    .tile {
+      width: 50px;
+      height: 100px;
+      background: #fff;
+      border: 2px solid #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      cursor: pointer;
+    }
+    #status {
+      text-align: center;
+      padding: 10px;
+      font-size: 1.2em;
+    }
   </style>
 </head>
 <body>
-  <h1>Domino Game</h1>
-  <div style="text-align:center">
-    <input type="text" id="roomCode" placeholder="Enter Room Code">
+  <div id="status">Enter Room Code:</div>
+  <div style="text-align:center;">
+    <input type="text" id="roomInput" placeholder="Room code">
     <button onclick="joinRoom()">Join Room</button>
   </div>
-  <div id="status">Not connected</div>
   <div id="board"></div>
-  <h2>Your Hand</h2>
   <div id="hand"></div>
 
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
   <script>
     const socket = io("https://dominoesgame.glitch.me");
-    const hand = document.getElementById("hand");
-    const board = document.getElementById("board");
-    const status = document.getElementById("status");
-
-    let myId = null;
+    let myId;
     let myTiles = [];
     let currentTurn = null;
     let roomCode = null;
-    let boardTiles = [];
-    let tilesLeftByPlayer = {};
-    let lastPassed = false;
 
     socket.on("connect", () => {
       myId = socket.id;
-      status.textContent = "Connected to server.";
     });
 
     function joinRoom() {
-      roomCode = document.getElementById("roomCode").value.trim();
+      roomCode = document.getElementById("roomInput").value;
       if (roomCode) {
         socket.emit("join-room", roomCode);
-        status.textContent = "Joining room...";
+        document.getElementById("status").innerText = "Waiting for players...";
       }
     }
 
     socket.on("player-joined", (players) => {
-      status.textContent = `Players in room: ${players.length}`;
+      document.getElementById("status").innerText = `Players in room: ${players.length}`;
     });
 
     socket.on("tiles", (tiles) => {
@@ -65,126 +75,77 @@
       renderHand();
     });
 
-    socket.on("game-start", ({ board: boardState, players, currentTurn: turn }) => {
-      currentTurn = turn;
-      boardTiles = boardState;
-      lastPassed = false;
-      renderBoard();
+    socket.on("game-start", ({ board, players, currentTurn: ct }) => {
+      renderBoard(board);
+      currentTurn = ct;
+      updateTurnDisplay();
+    });
+
+    socket.on("board-updated", ({ board, tilesLeft, currentTurn: ct }) => {
+      renderBoard(board);
+      myTiles = tilesLeft[myId];
       renderHand();
-      updateStatus();
-      checkAutoPass();
+      currentTurn = ct;
+      updateTurnDisplay();
     });
 
-    socket.on("board-updated", ({ board: boardState, tilesLeft, currentTurn: turn }) => {
-      currentTurn = turn;
-      boardTiles = boardState;
-      tilesLeftByPlayer = tilesLeft;
-      if (tilesLeft[myId]) {
-        myTiles = tilesLeft[myId];
-        renderHand();
+    function updateTurnDisplay() {
+      const status = document.getElementById("status");
+      if (currentTurn === myId) {
+        status.innerText = "Your turn";
+      } else {
+        status.innerText = "Opponent's turn";
       }
-      renderBoard();
-      updateStatus();
-      checkWinConditions();
-      checkAutoPass();
-    });
+    }
 
-    function renderHand() {
-      hand.innerHTML = "";
-      const [first, last] = boardTiles.length > 0 ? [boardTiles[0][0], boardTiles[boardTiles.length - 1][1]] : [null, null];
-      myTiles.forEach(tile => {
-        const el = document.createElement("div");
-        el.className = "tile";
-        el.textContent = `${tile[0]}|${tile[1]}`;
+    function renderTile(tile) {
+      const div = document.createElement("div");
+      div.className = "tile";
+      div.innerText = `${tile[0]}|${tile[1]}`;
+      return div;
+    }
 
-        const playable = boardTiles.length === 0 || tile.includes(first) || tile.includes(last);
-        if (currentTurn === myId && playable) el.classList.add("playable");
-
-        el.onclick = () => playTile(tile);
-        hand.appendChild(el);
+    function renderBoard(board) {
+      const boardDiv = document.getElementById("board");
+      boardDiv.innerHTML = "";
+      board.forEach(tile => {
+        boardDiv.appendChild(renderTile(tile));
       });
     }
 
-    function renderBoard() {
-      board.innerHTML = "";
-      boardTiles.forEach(tile => {
-        const el = document.createElement("div");
-        el.className = "tile";
-        el.textContent = `${tile[0]}|${tile[1]}`;
-        board.appendChild(el);
+    function renderHand() {
+      const handDiv = document.getElementById("hand");
+      handDiv.innerHTML = "";
+      myTiles.forEach(tile => {
+        const tileDiv = renderTile(tile);
+        tileDiv.onclick = () => playTile(tile);
+        handDiv.appendChild(tileDiv);
       });
     }
 
     function playTile(tile) {
-      if (currentTurn !== myId) {
-        alert("Not your turn!");
-        return;
-      }
-
-      if (tile === null) {
-        socket.emit("play-tile", { roomCode, tile: null });
-        return;
-      }
-
-      if (boardTiles.length === 0) {
-        socket.emit("play-tile", { roomCode, tile });
-        return;
-      }
-
-      const [first, last] = [boardTiles[0][0], boardTiles[boardTiles.length - 1][1]];
-      if (tile[0] === first || tile[1] === first || tile[0] === last || tile[1] === last) {
-        socket.emit("play-tile", { roomCode, tile });
-        lastPassed = false;
-      } else {
-        alert("Invalid move. Tile does not match either end of the board.");
-      }
-    }
-
-    function updateStatus() {
-      status.textContent = (currentTurn === myId) ? "Your turn" : "Waiting for opponent...";
-    }
-
-    function checkWinConditions() {
-      if (myTiles.length === 0) {
-        alert("You win!");
-      }
-    }
-
-    function checkAutoPass() {
       if (currentTurn !== myId) return;
-      if (boardTiles.length === 0) return;
+      socket.emit("play-tile", { roomCode, tile });
+    }
 
-      const [first, last] = [boardTiles[0][0], boardTiles[boardTiles.length - 1][1]];
-      const hasPlayable = myTiles.some(tile => tile.includes(first) || tile.includes(last));
+    // If no playable tile, allow player to pass
+    function passTurn() {
+      if (currentTurn !== myId) return;
+      socket.emit("play-tile", { roomCode, tile: null });
+    }
 
-      if (!hasPlayable) {
-        if (lastPassed) {
-          endBlockedGame();
+    // Handle game-over event
+    socket.on("game-over", ({ reason, winner, tie, scores }) => {
+      if (reason === "blocked") {
+        if (tie) {
+          alert("Game blocked! It's a draw.");
+        } else if (winner === myId) {
+          alert("Game blocked! You win by lowest pips.");
         } else {
-          alert("No playable tiles. Turn skipped.");
-          lastPassed = true;
-          socket.emit("play-tile", { roomCode, tile: null });
+          alert("Game blocked! Opponent wins by lowest pips.");
         }
-      } else {
-        lastPassed = false;
       }
-    }
-
-    function endBlockedGame() {
-      const totals = Object.entries(tilesLeftByPlayer).map(([id, tiles]) => {
-        const sum = tiles.reduce((acc, t) => acc + t[0] + t[1], 0);
-        return { id, sum };
-      });
-      totals.sort((a, b) => a.sum - b.sum);
-
-      if (totals.length < 2 || totals[0].sum === totals[1].sum) {
-        alert("Game blocked! It's a draw.");
-      } else if (totals[0].id === myId) {
-        alert("Game blocked! You win by lowest pips.");
-      } else {
-        alert("Game blocked! Opponent wins by lowest pips.");
-      }
-    }
+    });
   </script>
 </body>
 </html>
