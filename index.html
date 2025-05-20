@@ -289,6 +289,13 @@ h1 {
     </div>
   </div>
 
+  <div id="chatContainer" style="max-width: 420px; width: 100%; margin-top: 20px;">
+  <div id="chatMessages" style="height: 150px; overflow-y: auto; background: #111; padding: 10px; border-radius: 8px; border: 1px solid #555;"></div>
+  <input id="chatInput" placeholder="Type a message..." style="width: calc(100% - 60px); padding: 10px; margin-top: 8px; border-radius: 6px; border: none;" />
+  <button id="sendChatBtn" style="width: 50px; margin-top: 8px; padding: 10px; border-radius: 6px; background: #4caf50; color: white; border: none;">Send</button>
+   </div>
+
+
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
   <script>
@@ -486,6 +493,34 @@ h1 {
         localStorage.setItem("dominoPlayerName", playerNameInput.value.trim());
       }
     });
+
+// chat messages code
+const chatInput = document.getElementById("chatInput");
+const sendChatBtn = document.getElementById("sendChatBtn");
+const chatMessages = document.getElementById("chatMessages");
+
+sendChatBtn.onclick = sendMessage;
+chatInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") sendMessage();
+});
+
+function sendMessage() {
+  const msg = chatInput.value.trim();
+  if (msg && currentRoom) {
+    socket.emit("chat-message", { roomCode: currentRoom, name: playerNameInput.value || "Player", message: msg });
+    chatInput.value = "";
+  }
+}
+
+socket.on("chat-message", ({ name, message }) => {
+  const msgDiv = document.createElement("div");
+  msgDiv.textContent = `${name}: ${message}`;
+  msgDiv.style.marginBottom = "6px";
+  chatMessages.appendChild(msgDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+});
+
+    
   </script>
 
 </body>
